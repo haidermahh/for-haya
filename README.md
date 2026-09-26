@@ -1,18 +1,19 @@
-# 🌸 For Haya — A Timeless Tribute ✨
+# 🕯️ For Haya — A Timeless Tribute ✨
 
 An ultra-premium, cinematic digital tribute and belated birthday celebration website crafted for **Haya** (born May 5, 2009).
 
 > *"Though the calendar page has turned, genuine wishes hold no expiration."*
 
-Built with **pure HTML5, CSS3, and modern JavaScript** (zero build tools, zero dependencies, no frameworks). Deployable directly to **Vercel** or **Cloudflare Pages** in seconds with 100% static hosting.
+Built with **pure HTML5, CSS3, and modern JavaScript** (zero build tools, zero frameworks, no bundlers). Deployable directly to **Vercel** or **Cloudflare Pages** in seconds with 100% static hosting.
 
 ---
 
-## ⚜️ Creative Direction: Haute Rose Gold Noir & Satin Blush
+## ⚜️ Creative Direction & Aesthetic
 
-- **Color Palette**: Deep midnight orchid & velvet espresso (`#0A070D`, `#120C18`, `#1A1022`), liquid rose-gold foil typography (`#E8A598`, `#FFEAE6`), champagne silk accents (`#F7D6D0`), and soft rose quartz glow shadows.
-- **Typography**: Displayed in **Cormorant Garamond** (timeless editorial serif) paired with **Jost** (clean geometric sans-serif), loaded via Google Fonts.
-- **Micro-Interactions**: Slow, luxurious easing curves (`cubic-bezier(0.16, 1, 0.3, 1)`), subtle film grain texture, and slow-drifting rose gold dust motes.
+- **Primary Aesthetic**: Dark Charcoal & Deep Espresso backgrounds (`#08070A`, `#0C0B10`, `#15131C`) with rich, restrained **24K Gold-Foil accents** (`#D4AF37`, `#C9A96A`, `#FFF4D0`), cream/ivory text (`#F9F6F0`), and soft gold glow shadows.
+- **Dual Luxury Palettes**: Includes an instant aesthetic switcher in the top bar (`✦ Gold Foil` ⇄ `🌸 Rose Gold`) allowing you to enjoy both 24K Gold Foil and Haute Rose Gold Noir.
+- **Typography**: Editorial display in **Cormorant Garamond** (timeless serif display) paired with **Jost** (clean geometric sans-serif), loaded via Google Fonts.
+- **Micro-Interactions**: Slow custom cubic-bezier easing curves (`cubic-bezier(0.16, 1, 0.3, 1)`), subtle film grain texture, and slow-drifting gold dust motes.
 - **Belated Framing**: Crafted specifically with the understanding that her birthday has already passed this year—framing the message as an enduring, timeless celebration of her character, growth, and the luminous chapter ahead.
 
 ---
@@ -20,37 +21,46 @@ Built with **pure HTML5, CSS3, and modern JavaScript** (zero build tools, zero d
 ## 🏛️ Sections Included
 
 1. **Hero Introduction (`#hero`)**:
-   - Small rose-gold kicker line: `FOR HAYA • BORN MAY 5, 2009`.
+   - Small gold kicker line: `FOR HAYA • BORN MAY 5, 2009`.
    - Large serif display headline: *"A Celebration of You"*.
    - Thoughtful belated message acknowledging that wishes are timeless.
-   - Minimalist scroll prompt with a pulsing vertical rose-gold line.
+   - Minimalist scroll prompt with a pulsing vertical gold hairline indicator.
 
 2. **A Moment to Celebrate (`#celebrate`)**:
-   - Minimalist line-art candle illustration in rose gold with an ethereal, softly swaying flame and ambient halo.
+   - Minimalist line-art candle illustration in gold with an ethereal, softly swaying flame and ambient halo.
    - Interactive button: **"Make a wish, even now"**.
-   - Triggers a slow, radial burst of shimmering rose gold light particles and reveals the quote:
+   - Triggers a slow, radial burst of shimmering gold light particles and reveals the quote:
      > *“Some wishes don't need a date. Yours is already coming true.”*
 
 3. **Heartfelt Letter (`#letter`)**:
-   - Glassmorphism letter card with rose gold hairline dividers and an antique rose wax seal (`H`).
+   - Glassmorphism letter card with fine gold hairline dividers and a golden wax seal (`H`).
    - Sincere, beautifully written words honoring her depth, kindness, and journey since May 5, 2009.
    - Line-by-line cinematic fade-and-rise entrance animation powered by Intersection Observer.
 
 4. **Reflections of Grace Gallery (`#gallery`)**:
-   - 3 glass-framed memory cards with subtle 3D hover-tilt and deep rose noir/quartz gradient placeholders.
+   - 3 glass-framed memory cards with subtle 3D hover-tilt and deep gold/obsidian gradient placeholders.
    - Marked with clear code comments showing where to drop in real `<img>` tags if desired.
 
 5. **Whispered Wishes Orbs (`#orbs`)**:
-   - 5 glowing rose-gold orbs orbiting gently on independent sinusoidal float paths.
-   - Tapping an orb smoothly expands it into a tender blessing for her journey ahead.
+   - 5 floating gold orbs orbiting gently on independent sinusoidal float paths.
+   - Tapping an orb smoothly expands it into a centered modal card with a blurred backdrop overlay, close button (`✕`), and tender blessing for her journey ahead.
 
 6. **Closing & Signature (`#closing`)**:
-   - Closing line: *"Made with love, thinking of you — always."* with a pulsing rose-gold heart monogram.
+   - Closing line: *"Made with love, thinking of you — always."* with a pulsing gold heart monogram.
    - Dynamically generated date caption: *"Sent on [Current Date] — though the wish is timeless."*
 
 7. **Harmonic Sound Engine (Web Audio API)**:
    - Built-in synthesizer that generates soft, meditative crystal chimes on demand.
    - Zero external audio files—100% reliable offline, zero CORS or 404 errors.
+
+---
+
+## 📱 Mobile Responsiveness Features
+
+- **Full Mobile Ergonomics**: Tested across mobile viewports (down to 320px width), with safe-area insets (`env(safe-area-inset-top)` / `env(safe-area-inset-bottom)`) for iPhone notch and gesture navigation bars.
+- **Dynamic Viewports**: Uses `min-height: 100svh` to prevent layout jumps when mobile address bars appear/disappear.
+- **Touch Optimization**: Smooth touch scrolling (`-webkit-overflow-scrolling: touch`), tap highlight removal (`-webkit-tap-highlight-color: transparent`), and accessible minimum 48px touch targets.
+- **Reduced Motion Support**: Built-in `@media (prefers-reduced-motion: reduce)` for accessibility.
 
 ---
 

@@ -139,7 +139,41 @@
   }
 
   /* ==========================================================================
-     2. ROSE GOLD DUST CANVAS & CELESTIAL STARDUST BURST
+     THEME TOGGLE ENGINE (24K GOLD FOIL <-> ROSE GOLD NOIR)
+     ========================================================================== */
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
+  const themeLabel = document.getElementById('theme-label-text');
+  const themeIcon = document.getElementById('theme-icon');
+
+  let currentTheme = localStorage.getItem('haya_theme') || 'gold';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  updateThemeButtonUI();
+
+  function updateThemeButtonUI() {
+    if (currentTheme === 'rose') {
+      if (themeLabel) themeLabel.textContent = 'Rose Gold';
+      if (themeIcon) themeIcon.textContent = '🌸';
+    } else {
+      if (themeLabel) themeLabel.textContent = 'Gold Foil';
+      if (themeIcon) themeIcon.textContent = '✦';
+    }
+  }
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      currentTheme = currentTheme === 'gold' ? 'rose' : 'gold';
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      try {
+        localStorage.setItem('haya_theme', currentTheme);
+      } catch (e) {}
+      updateThemeButtonUI();
+      // Soft chime upon theme switch
+      audioEngine.playBell(currentTheme === 'rose' ? 659.25 : 523.25, 1.2, 0.05);
+    });
+  }
+
+  /* ==========================================================================
+     2. GOLD DUST CANVAS & CELESTIAL STARDUST BURST
      ========================================================================== */
   const canvas = document.getElementById('gold-dust-canvas');
   if (canvas) {
@@ -147,19 +181,29 @@
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    // Drifting rose-gold motes
+    // Drifting gold motes
     const dustCount = Math.floor(Math.min(width, 1400) / 16);
     const dustParticles = [];
     const burstParticles = [];
 
-    // Haute Rose Gold & Satin Blush Palette
-    const roseHues = [
-      'rgba(255, 234, 230, ', // Champagne silk
-      'rgba(232, 165, 152, ', // Pure Rose Gold
-      'rgba(247, 214, 208, ', // Blush Quartz
-      'rgba(255, 204, 213, ', // Velvet Rose Glow
-      'rgba(212, 139, 126, '  // Warm Antique Rose
-    ];
+    function getActivePalette() {
+      if (currentTheme === 'rose') {
+        return [
+          'rgba(255, 234, 230, ',
+          'rgba(232, 165, 152, ',
+          'rgba(247, 214, 208, ',
+          'rgba(255, 204, 213, ',
+          'rgba(212, 139, 126, '
+        ];
+      }
+      return [
+        'rgba(243, 229, 171, ', // Champagne
+        'rgba(212, 175, 55, ',  // Pure 24K Gold
+        'rgba(201, 169, 106, ', // Muted Antique Gold
+        'rgba(255, 244, 208, ', // Ivory Glow
+        'rgba(230, 202, 133, '  // Gold Silk
+      ];
+    }
 
     class RoseDustMote {
       constructor() {
@@ -167,6 +211,7 @@
       }
 
       reset() {
+        const palette = getActivePalette();
         this.x = Math.random() * width;
         this.y = Math.random() * height;
         this.radius = Math.random() * 1.6 + 0.4;
@@ -175,7 +220,7 @@
         this.speedX = (Math.random() - 0.5) * 0.15;
         this.pulseSpeed = Math.random() * 0.015 + 0.005;
         this.pulseDir = Math.random() > 0.5 ? 1 : -1;
-        this.color = roseHues[Math.floor(Math.random() * roseHues.length)];
+        this.color = palette[Math.floor(Math.random() * palette.length)];
       }
 
       update() {
@@ -208,9 +253,10 @@
       }
     }
 
-    // Graceful rose-gold stardust particle for the wish burst
+    // Graceful gold stardust particle for the wish burst
     class RoseStardustBurst {
       constructor(originX, originY) {
+        const palette = getActivePalette();
         this.x = originX;
         this.y = originY;
         const angle = Math.random() * Math.PI * 2;
@@ -222,7 +268,7 @@
         this.radius = Math.random() * 2.2 + 0.8;
         this.alpha = 1;
         this.decay = Math.random() * 0.012 + 0.006;
-        this.color = roseHues[Math.floor(Math.random() * roseHues.length)];
+        this.color = palette[Math.floor(Math.random() * palette.length)];
       }
 
       update() {

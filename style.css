@@ -5,9 +5,65 @@
    ========================================================================== */
 
 /* --------------------------------------------------
-   1. DESIGN TOKENS & LUXURY ROSE GOLD PALETTE
+   1. DESIGN TOKENS & LUXURY RESTRAINED GOLD PALETTE
    -------------------------------------------------- */
-:root {
+:root, [data-theme="gold"] {
+  /* Rich Dark Charcoal & Deep Espresso Baselines */
+  --bg-deep: #08070a;
+  --bg-surface: #0e0d13;
+  --bg-gradient-top: #15131c;
+  --bg-gradient-mid: #0c0b10;
+  --bg-gradient-bottom: #060508;
+  
+  --bg-card: rgba(18, 16, 23, 0.65);
+  --bg-card-hover: rgba(26, 23, 33, 0.78);
+
+  /* Restrained Rich Gold Foil (#D4AF37 / #C9A96A) */
+  --rose-primary: #D4AF37;
+  --rose-light: #FFF4D0;
+  --rose-silk: #F3E5AB;
+  --rose-soft: #C9A96A;
+  --rose-deep: #8C7335;
+  --rose-antique: #8C7335;
+  --rose-quartz: #E6CA85;
+  --rose-blush: #F3E5AB;
+
+  /* Gold Shimmer & Halos */
+  --rose-glow: rgba(212, 175, 55, 0.28);
+  --rose-halo: rgba(243, 229, 171, 0.16);
+  --pink-sparkle: rgba(243, 229, 171, 0.25);
+
+  --gold-primary: #D4AF37;
+  --gold-light: #FFF4D0;
+  --gold-soft: #C9A96A;
+
+  /* Cream / Ivory Text */
+  --text-ivory: #F9F6F0;
+  --text-cashmere: #EADBC8;
+  --text-muted: #A8A398;
+  --text-subtle: #6E6A63;
+
+  /* Fine Gold Hairline Dividers */
+  --hairline-rose: rgba(212, 175, 55, 0.2);
+  --hairline-rose-strong: rgba(212, 175, 55, 0.42);
+  --hairline-white: rgba(255, 255, 255, 0.08);
+
+  /* Typography */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Jost', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Luxurious Easing Curves */
+  --ease-lux: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Timing */
+  --speed-fast: 0.3s;
+  --speed-mid: 0.6s;
+  --speed-slow: 1.1s;
+}
+
+[data-theme="rose"] {
   /* Rich Velvet Noir & Deep Aubergine Baselines */
   --bg-deep: #0a070d;
   --bg-surface: #120c18;
@@ -24,6 +80,7 @@
   --rose-silk: #F7D6D0;
   --rose-soft: #D48B7E;
   --rose-deep: #A65D52;
+  --rose-antique: #A65D52;
   --rose-quartz: #E5B3BB;
   --rose-blush: #FFCCD5;
 
@@ -31,6 +88,10 @@
   --rose-glow: rgba(232, 165, 152, 0.32);
   --rose-halo: rgba(255, 234, 230, 0.16);
   --pink-sparkle: rgba(247, 214, 208, 0.25);
+
+  --gold-primary: #E8A598;
+  --gold-light: #FFEAE6;
+  --gold-soft: #D48B7E;
 
   /* Refined Text Tones */
   --text-ivory: #FFF5F2;
@@ -41,21 +102,6 @@
   /* Fine Hairlines & Glass Borders */
   --hairline-rose: rgba(232, 165, 152, 0.22);
   --hairline-rose-strong: rgba(232, 165, 152, 0.48);
-  --hairline-white: rgba(255, 255, 255, 0.09);
-
-  /* Typography */
-  --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-body: 'Jost', -apple-system, BlinkMacSystemFont, sans-serif;
-
-  /* Luxurious Easing Curves */
-  --ease-lux: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-
-  /* Timing */
-  --speed-fast: 0.3s;
-  --speed-mid: 0.6s;
-  --speed-slow: 1.1s;
 }
 
 /* --------------------------------------------------
@@ -243,6 +289,13 @@ main {
   letter-spacing: 0.22em;
   color: var(--text-subtle);
   text-transform: uppercase;
+}
+
+.ambient-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  pointer-events: auto;
 }
 
 .gold-pill-btn {

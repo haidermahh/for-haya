@@ -40,7 +40,11 @@
       <span class="monogram-letter">H</span>
       <span class="monogram-sub">MCMIX • V • V</span>
     </div>
-    <div class="audio-control-box">
+    <div class="ambient-controls-group">
+      <button id="theme-toggle-btn" class="gold-pill-btn theme-btn" aria-label="Toggle Theme Palette" title="Toggle Gold Foil / Rose Gold">
+        <span class="theme-icon" id="theme-icon">✦</span>
+        <span id="theme-label-text">Gold Foil</span>
+      </button>
       <button id="audio-toggle-btn" class="gold-pill-btn" aria-label="Toggle ambient chimes">
         <span class="audio-wave-icon" aria-hidden="true">
           <span></span><span></span><span></span>
@@ -50,7 +54,7 @@
     </div>
   </aside>
 
-  <!-- Interactive Rose Gold Dust & Starfield Canvas -->
+  <!-- Interactive Golden Dust & Starfield Canvas -->
   <canvas id="gold-dust-canvas" aria-hidden="true"></canvas>
 
   <!-- Subtle Film Grain Overlay -->
@@ -62,7 +66,7 @@
          ============================================================ -->
     <section id="hero" class="snap-section hero-section" aria-label="Hero Introduction">
       <div class="hero-inner">
-        <!-- Small rose gold kicker line -->
+        <!-- Small gold kicker line -->
         <div class="hero-kicker reveal-item">
           <span class="hairline-dash"></span>
           <span class="kicker-text">FOR HAYA • BORN MAY 5, 2009</span>
@@ -78,7 +82,7 @@
         <!-- Tasteful Belated Subheading -->
         <p class="hero-subtitle reveal-item">
           Though the calendar page has turned, genuine wishes hold no expiration.
-          This is a quiet, enduring tribute to your grace, the warmth you bring into every room, and every dream waiting for you in the year ahead.
+          This is a quiet, enduring tribute to your grace, the light you bring to those around you, and every dream waiting for you in the year ahead.
         </p>
 
         <!-- Elegant Primary Action -->
@@ -90,7 +94,7 @@
         </div>
       </div>
 
-      <!-- Minimalist Scroll Indicator (Pulsing Rose Gold Line) -->
+      <!-- Minimalist Scroll Indicator (Pulsing Gold Line) -->
       <a href="#celebrate" class="scroll-prompt" aria-label="Scroll to begin">
         <span class="scroll-prompt-text">Scroll to begin</span>
         <div class="scroll-line-wrapper">
@@ -100,7 +104,7 @@
     </section>
 
     <!-- ============================================================
-         2. A MOMENT TO CELEBRATE (MINIMALIST ROSE GOLD CANDLE)
+         2. A MOMENT TO CELEBRATE (MINIMALIST LINE-ART CANDLE)
          ============================================================ -->
     <section id="celebrate" class="snap-section candle-section" aria-label="A Moment to Celebrate">
       <div class="section-container">
@@ -116,29 +120,29 @@
           Some wishes don't belong to a single day on the calendar. They belong to you, whenever you are ready.
         </p>
 
-        <!-- Minimalist Rose Gold Line-Art Candle Artwork -->
+        <!-- Minimalist Gold Line-Art Candle Artwork -->
         <div class="candle-stage reveal-item">
-          <div class="candle-art-wrapper" id="candle-artwork" role="img" aria-label="Minimalist rose gold candle with an ethereal flame">
+          <div class="candle-art-wrapper" id="candle-artwork" role="img" aria-label="Minimalist golden candle with an ethereal flame">
             <svg class="candle-svg" viewBox="0 0 200 320" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <!-- Flame Radial Glow -->
                 <radialGradient id="flameGlowGrad" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="#FFF0EC" stop-opacity="0.9" />
-                  <stop offset="35%" stop-color="#E8A598" stop-opacity="0.65" />
-                  <stop offset="70%" stop-color="#C27D72" stop-opacity="0.25" />
-                  <stop offset="100%" stop-color="#0A070D" stop-opacity="0" />
+                  <stop offset="0%" stop-color="#FFF4D0" stop-opacity="0.9" />
+                  <stop offset="35%" stop-color="#D4AF37" stop-opacity="0.65" />
+                  <stop offset="70%" stop-color="#C9A96A" stop-opacity="0.25" />
+                  <stop offset="100%" stop-color="#08070A" stop-opacity="0" />
                 </radialGradient>
-                <!-- Rose Gold Line Gradient -->
+                <!-- Gold Line Gradient -->
                 <linearGradient id="roseLineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#FFEAE6" />
-                  <stop offset="50%" stop-color="#E8A598" />
-                  <stop offset="100%" stop-color="#9E564C" />
+                  <stop offset="0%" stop-color="#FFF4D0" />
+                  <stop offset="50%" stop-color="#D4AF37" />
+                  <stop offset="100%" stop-color="#8C7335" />
                 </linearGradient>
                 <!-- Candle Body Gradient -->
                 <linearGradient id="candleBodyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="rgba(232, 165, 152, 0.08)" />
-                  <stop offset="50%" stop-color="rgba(255, 234, 230, 0.18)" />
-                  <stop offset="100%" stop-color="rgba(232, 165, 152, 0.08)" />
+                  <stop offset="0%" stop-color="rgba(212, 175, 55, 0.08)" />
+                  <stop offset="50%" stop-color="rgba(243, 229, 171, 0.18)" />
+                  <stop offset="100%" stop-color="rgba(212, 175, 55, 0.08)" />
                 </linearGradient>
               </defs>
 
@@ -148,19 +152,19 @@
               <!-- Animated Flickering Flame -->
               <g class="candle-flame-group" id="candle-flame">
                 <!-- Outer Teardrop Flame -->
-                <path class="flame-outer" d="M100 48 C92 70 82 82 85 96 C88 110 112 110 115 96 C118 82 108 70 100 48 Z" fill="#FFEAE6" />
-                <!-- Core White-Hot Rose Flame -->
+                <path class="flame-outer" d="M100 48 C92 70 82 82 85 96 C88 110 112 110 115 96 C118 82 108 70 100 48 Z" fill="#FFE59E" />
+                <!-- Core White-Hot Flame -->
                 <path class="flame-inner" d="M100 66 C96 78 92 86 94 94 C96 100 104 100 106 94 C108 86 104 78 100 66 Z" fill="#FFFFFF" />
               </g>
 
               <!-- Minimalist Wick -->
-              <line x1="100" y1="102" x2="100" y2="114" stroke="#9E564C" stroke-width="2" stroke-linecap="round" />
+              <line x1="100" y1="102" x2="100" y2="114" stroke="#8C7335" stroke-width="2" stroke-linecap="round" />
 
               <!-- Candle Column (Fine Hairline Architecture) -->
               <rect x="76" y="114" width="48" height="120" rx="3" fill="url(#candleBodyGrad)" stroke="url(#roseLineGrad)" stroke-width="1.2" />
 
               <!-- Candle Wax Rim Accent -->
-              <ellipse cx="100" cy="114" rx="24" ry="4" fill="rgba(255, 234, 230, 0.2)" stroke="url(#roseLineGrad)" stroke-width="1.2" />
+              <ellipse cx="100" cy="114" rx="24" ry="4" fill="rgba(243, 229, 171, 0.2)" stroke="url(#roseLineGrad)" stroke-width="1.2" />
 
               <!-- Minimalist Pedestal / Dish -->
               <ellipse cx="100" cy="234" rx="42" ry="7" fill="none" stroke="url(#roseLineGrad)" stroke-width="1.2" />
