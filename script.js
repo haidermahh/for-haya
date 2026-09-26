@@ -153,6 +153,9 @@
     if (currentTheme === 'rose') {
       if (themeLabel) themeLabel.textContent = 'Rose Gold';
       if (themeIcon) themeIcon.textContent = '🌸';
+    } else if (currentTheme === 'purple') {
+      if (themeLabel) themeLabel.textContent = 'Amethyst';
+      if (themeIcon) themeIcon.textContent = '💜';
     } else {
       if (themeLabel) themeLabel.textContent = 'Gold Foil';
       if (themeIcon) themeIcon.textContent = '✦';
@@ -161,14 +164,17 @@
 
   if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', () => {
-      currentTheme = currentTheme === 'gold' ? 'rose' : 'gold';
+      if (currentTheme === 'gold') currentTheme = 'rose';
+      else if (currentTheme === 'rose') currentTheme = 'purple';
+      else currentTheme = 'gold';
       document.documentElement.setAttribute('data-theme', currentTheme);
       try {
         localStorage.setItem('haya_theme', currentTheme);
       } catch (e) {}
       updateThemeButtonUI();
       // Soft chime upon theme switch
-      audioEngine.playBell(currentTheme === 'rose' ? 659.25 : 523.25, 1.2, 0.05);
+      const chimeFreq = currentTheme === 'rose' ? 659.25 : currentTheme === 'purple' ? 783.99 : 523.25;
+      audioEngine.playBell(chimeFreq, 1.2, 0.05);
     });
   }
 
@@ -194,6 +200,15 @@
           'rgba(247, 214, 208, ',
           'rgba(255, 204, 213, ',
           'rgba(212, 139, 126, '
+        ];
+      }
+      if (currentTheme === 'purple') {
+        return [
+          'rgba(221, 214, 254, ', // Lavender quartz
+          'rgba(192, 132, 252, ', // Amethyst
+          'rgba(168, 85, 247, ',  // Deep violet
+          'rgba(245, 240, 255, ', // Pale orchid
+          'rgba(196, 181, 253, '  // Lilac silk
         ];
       }
       return [

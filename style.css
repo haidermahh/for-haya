@@ -104,6 +104,48 @@
   --hairline-rose-strong: rgba(232, 165, 152, 0.48);
 }
 
+[data-theme="purple"] {
+  /* Deep Midnight Violet & Velvet Noir Baselines */
+  --bg-deep: #06050e;
+  --bg-surface: #0d0a1a;
+  --bg-gradient-top: #150f28;
+  --bg-gradient-mid: #0a0716;
+  --bg-gradient-bottom: #04030a;
+
+  --bg-card: rgba(16, 10, 32, 0.70);
+  --bg-card-hover: rgba(24, 15, 48, 0.84);
+
+  /* Amethyst & Soft Lavender Silk */
+  --rose-primary: #C084FC;
+  --rose-light: #F5F0FF;
+  --rose-silk: #E9D5FF;
+  --rose-soft: #A855F7;
+  --rose-deep: #7C3AED;
+  --rose-antique: #6D28D9;
+  --rose-quartz: #DDD6FE;
+  --rose-blush: #EDE9FE;
+
+  /* Amethyst Shimmer & Halos */
+  --rose-glow: rgba(192, 132, 252, 0.30);
+  --rose-halo: rgba(233, 213, 255, 0.15);
+  --pink-sparkle: rgba(221, 214, 254, 0.22);
+
+  --gold-primary: #C084FC;
+  --gold-light: #F5F0FF;
+  --gold-soft: #A855F7;
+
+  /* Lavender Text Tones */
+  --text-ivory: #FAF5FF;
+  --text-cashmere: #EDE9FE;
+  --text-muted: #C4B5FD;
+  --text-subtle: #8B5CF6;
+
+  /* Fine Amethyst Hairlines & Glass Borders */
+  --hairline-rose: rgba(192, 132, 252, 0.20);
+  --hairline-rose-strong: rgba(192, 132, 252, 0.45);
+  --hairline-white: rgba(255, 255, 255, 0.07);
+}
+
 /* --------------------------------------------------
    2. RESET & FOUNDATIONS
    -------------------------------------------------- */
