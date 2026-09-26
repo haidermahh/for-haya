@@ -343,39 +343,66 @@
      4. QUIET WISH ORBS CONSTELLATION INTERACTION
      ========================================================================== */
   const orbWrappers = document.querySelectorAll('.wish-orb-wrapper');
+  const orbBackdrop = document.getElementById('orb-backdrop');
+
+  function closeAllOrbs() {
+    orbWrappers.forEach((w) => w.classList.remove('is-open'));
+    if (orbBackdrop) orbBackdrop.classList.remove('is-active');
+  }
 
   orbWrappers.forEach((wrapper) => {
     const orb = wrapper.querySelector('.wish-orb');
-    if (!orb) return;
+    const closeBtn = wrapper.querySelector('.orb-close-btn');
 
-    orb.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = wrapper.classList.contains('is-open');
+    if (orb) {
+      orb.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = wrapper.classList.contains('is-open');
 
-      // Close all other open orbs
-      orbWrappers.forEach((w) => w.classList.remove('is-open'));
+        // Close all other open orbs first
+        closeAllOrbs();
 
-      if (!isOpen) {
-        wrapper.classList.add('is-open');
+        if (!isOpen) {
+          wrapper.classList.add('is-open');
+          if (orbBackdrop) orbBackdrop.classList.add('is-active');
 
-        // Play gentle bell tone corresponding to orb id
-        const id = parseInt(wrapper.getAttribute('data-id') || '1', 10);
-        const pitch = audioEngine.frequencies[(id * 2) % audioEngine.frequencies.length];
-        audioEngine.playBell(pitch, 2.0, 0.08);
+          // Play gentle bell tone corresponding to orb id
+          const id = parseInt(wrapper.getAttribute('data-id') || '1', 10);
+          const pitch = audioEngine.frequencies[(id * 2) % audioEngine.frequencies.length];
+          audioEngine.playBell(pitch, 2.0, 0.08);
 
-        // Small rose gold stardust shimmer at the orb
-        const rect = orb.getBoundingClientRect();
-        if (window.emitLuxuryRoseBurst) {
-          window.emitLuxuryRoseBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 22);
+          // Small rose gold stardust shimmer at the orb
+          const rect = orb.getBoundingClientRect();
+          if (window.emitLuxuryRoseBurst) {
+            window.emitLuxuryRoseBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 22);
+          }
         }
-      }
-    });
+      });
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeAllOrbs();
+      });
+    }
   });
 
-  // Close opened orb card when clicking outside
+  // Close opened orb card when clicking outside or on backdrop
+  if (orbBackdrop) {
+    orbBackdrop.addEventListener('click', closeAllOrbs);
+  }
+
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.wish-orb-wrapper')) {
-      orbWrappers.forEach((w) => w.classList.remove('is-open'));
+      closeAllOrbs();
+    }
+  });
+
+  // Close on Escape key for accessibility
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeAllOrbs();
     }
   });
 

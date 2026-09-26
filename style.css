@@ -71,20 +71,28 @@ html {
   font-size: 16px;
   scroll-behavior: smooth;
   scroll-snap-type: y proximity;
+  scroll-padding-top: calc(4.5rem + env(safe-area-inset-top, 0px));
   background-color: var(--bg-deep);
   color: var(--text-ivory);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
   font-family: var(--font-body);
   background: radial-gradient(circle at 50% 0%, var(--bg-gradient-top) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-bottom) 100%);
   min-height: 100vh;
+  min-height: 100svh;
   overflow-x: hidden;
+  width: 100%;
   line-height: 1.75;
   position: relative;
   letter-spacing: 0.025em;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Rose Gold Dust Canvas Background */
@@ -896,15 +904,15 @@ main {
 .orb-message-card {
   position: absolute;
   top: 95px;
-  width: 220px;
-  background: rgba(26, 16, 32, 0.94);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
+  width: 240px;
+  background: rgba(24, 15, 30, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--hairline-rose-strong);
-  border-radius: 16px;
-  padding: 1.1rem;
+  border-radius: 18px;
+  padding: 1.4rem 1.2rem 1.2rem;
   text-align: center;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 0 0 30px var(--rose-halo);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 35px var(--rose-halo);
   opacity: 0;
   visibility: hidden;
   transform: translateY(10px) scale(0.95);
@@ -924,17 +932,66 @@ main {
   box-shadow: 0 0 25px var(--rose-primary);
 }
 
+/* Close Button on Orb Card */
+.orb-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--hairline-rose);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--rose-silk);
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-lux);
+  line-height: 1;
+  padding: 0;
+}
+
+.orb-close-btn:hover {
+  background: rgba(232, 165, 152, 0.22);
+  border-color: var(--rose-primary);
+  color: #FFFFFF;
+  transform: scale(1.1);
+}
+
 .orb-card-icon {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   display: block;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.45rem;
 }
 
 .orb-card-text {
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 300;
   color: var(--text-cashmere);
-  line-height: 1.5;
+  line-height: 1.55;
+}
+
+/* Mobile Modal Backdrop for Orbs */
+.orb-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(8, 5, 10, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease-lux);
+  z-index: 998;
+}
+
+.orb-backdrop.is-active {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .orbs-hint-caption {
@@ -942,6 +999,8 @@ main {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--text-subtle);
+  text-align: center;
+  margin-top: 1rem;
 }
 
 /* --------------------------------------------------
@@ -1004,11 +1063,13 @@ main {
 }
 
 .dynamic-date-caption {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--rose-soft);
   font-weight: 300;
+  padding: 0 1rem;
+  line-height: 1.6;
 }
 
 .return-top-btn {
@@ -1020,6 +1081,9 @@ main {
   cursor: pointer;
   opacity: 0.65;
   transition: opacity var(--speed-fast) ease;
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0.5rem 1rem;
 }
 
 .return-top-btn:hover {
@@ -1092,51 +1156,260 @@ main {
 }
 
 /* --------------------------------------------------
-   13. RESPONSIVE DESIGN (MOBILE FIRST)
+   13. COMPREHENSIVE RESPONSIVE DESIGN (MOBILE FIRST)
    -------------------------------------------------- */
+
+/* Tablet & Smaller Laptops */
+@media (max-width: 900px) {
+  .section-title {
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+  }
+
+  .luxury-gallery-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+/* Tablets & Large Phones */
 @media (max-width: 768px) {
-  .snap-section {
-    padding: 5rem 1.4rem;
-    scroll-snap-align: none;
-  }
-
   html {
-    scroll-snap-type: none;
+    scroll-snap-type: none; /* Smooth touch flow on phones */
+    scroll-padding-top: calc(4.5rem + env(safe-area-inset-top, 0px));
   }
 
+  .snap-section {
+    padding: 5rem 1.25rem;
+    scroll-snap-align: none;
+    min-height: auto;
+  }
+
+  /* Header safe-area alignment */
   .ambient-header {
-    width: 92%;
-    top: 1.2rem;
+    width: 94%;
+    top: max(1rem, env(safe-area-inset-top));
   }
 
   .monogram-sub {
     display: none;
   }
 
+  .gold-pill-btn {
+    padding: 0.4rem 0.95rem;
+    font-size: 0.72rem;
+  }
+
+  /* Hero */
+  .hero-section {
+    min-height: 100svh;
+    padding-top: calc(6rem + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
+    justify-content: center;
+  }
+
   .hero-headline {
-    font-size: 3.4rem;
+    font-size: clamp(2.5rem, 8.8vw, 4rem);
+    margin-bottom: 1.4rem;
   }
 
+  .hero-subtitle {
+    font-size: clamp(0.95rem, 3.6vw, 1.1rem);
+    line-height: 1.75;
+    margin-bottom: 2.5rem;
+    padding: 0 0.4rem;
+  }
+
+  .gold-cta-btn {
+    padding: 0.85rem 2.2rem;
+    font-size: 0.8rem;
+  }
+
+  /* Candle */
+  .candle-art-wrapper {
+    width: 155px;
+    height: 245px;
+  }
+
+  .gold-outline-btn {
+    width: 100%;
+    max-width: 320px;
+    justify-content: center;
+    font-size: 0.78rem;
+    padding: 0.85rem 1.4rem;
+  }
+
+  .wish-revelation-box.is-revealed {
+    max-height: 320px;
+    padding: 1.8rem 1.4rem;
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .revelation-quote {
+    font-size: 1.3rem;
+  }
+
+  /* Letter Card */
   .luxury-letter-card {
-    padding: 2.2rem 1.4rem;
-    border-radius: 18px;
+    padding: 2.4rem 1.5rem;
+    border-radius: 20px;
   }
 
+  .letter-salutation {
+    font-size: 2.4rem;
+  }
+
+  .letter-body-content {
+    font-size: 1.02rem;
+    line-height: 1.85;
+    gap: 1.4rem;
+  }
+
+  .letter-accent-quote {
+    padding-left: 1.2rem;
+    font-size: 1.2rem;
+  }
+
+  /* Memory Gallery */
+  .luxury-gallery-grid {
+    grid-template-columns: 1fr;
+    max-width: 340px;
+    margin: 0 auto;
+    gap: 1.8rem;
+  }
+
+  /* Wish Orbs Constellation on Mobile */
   .orbs-constellation {
-    gap: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.4rem;
+    max-width: 340px;
   }
 
+  .wish-orb {
+    width: 74px;
+    height: 74px;
+  }
+
+  .orb-core {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Mobile Fullscreen Modal Card for Orbs */
   .orb-message-card {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0.95);
-    width: 85%;
-    max-width: 320px;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: min(88vw, 330px);
     z-index: 1000;
+    padding: 2.4rem 1.5rem 1.8rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 40px var(--rose-glow);
   }
 
   .wish-orb-wrapper.is-open .orb-message-card {
     transform: translate(-50%, -50%) scale(1);
   }
 }
+
+/* Compact Mobile Devices (iPhone SE, Small Androids) */
+@media (max-width: 480px) {
+  .hero-kicker {
+    font-size: 0.64rem;
+    letter-spacing: 0.2em;
+    gap: 0.7rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .hairline-dash {
+    width: 20px;
+  }
+
+  .hero-headline {
+    font-size: clamp(2.3rem, 11vw, 3.2rem);
+  }
+
+  .luxury-letter-card {
+    padding: 2rem 1.2rem;
+    border-radius: 18px;
+  }
+
+  .letter-salutation {
+    font-size: 2.1rem;
+  }
+
+  .letter-card-footer {
+    flex-direction: column-reverse;
+    align-items: center;
+    text-align: center;
+    gap: 1.4rem;
+  }
+
+  .letter-signoff {
+    align-items: center;
+  }
+
+  .candle-art-wrapper {
+    width: 135px;
+    height: 220px;
+  }
+
+  .closing-headline {
+    font-size: 1.7rem;
+  }
+}
+
+/* Very Narrow Devices (<= 360px) */
+@media (max-width: 360px) {
+  .hero-kicker {
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+  }
+
+  .hairline-dash {
+    display: none;
+  }
+
+  .ambient-header {
+    width: 96%;
+  }
+
+  .gold-pill-btn {
+    padding: 0.35rem 0.75rem;
+  }
+}
+
+/* Short Viewport Heights (e.g. mobile landscape or short browser screens) */
+@media (max-height: 720px) {
+  .scroll-prompt {
+    position: relative;
+    bottom: auto;
+    margin-top: 2.5rem;
+  }
+
+  .hero-section {
+    padding-top: calc(5rem + env(safe-area-inset-top, 0px));
+    padding-bottom: 3rem;
+  }
+}
+
+/* Accessibility: Respect Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .candle-flame-group,
+  .flame-halo,
+  .wish-orb,
+  .gold-heart-svg {
+    animation: none !important;
+  }
+}
+
