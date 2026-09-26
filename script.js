@@ -1,12 +1,12 @@
 /**
  * ==========================================================================
- * FOR HAYA — ULTRA-PREMIUM TRIBUTE & BELATED BIRTHDAY EXPERIENCE
+ * FOR HAYA — ULTRA-PREMIUM ROSE GOLD NOIR & SATIN BLUSH EXPERIENCE
  * Interactive JavaScript Engine:
- *  - Floating Golden Stardust / Dust Particle Canvas
- *  - Slow Graceful Gold Light Particle Burst (No cartoon confetti)
+ *  - Floating Rose Gold Stardust & Velvet Petal Particles
+ *  - Slow Graceful Rose Gold Light Burst (Haute Luxury)
  *  - Minimalist Web Audio Harmonic Chime Synthesizer
  *  - Candle "Make a Wish, Even Now" Interactive Revelation
- *  - Floating Wish Orbs Constellation Interaction
+ *  - Floating Rose Quartz Wish Orbs Constellation
  *  - Cinematic Intersection Observer Scroll Reveals
  *  - Subtle 3D Perspective Tilt for Gallery Cards
  *  - Dynamic Timeless Date Formulation
@@ -25,17 +25,17 @@
       this.isPlaying = false;
       this.ambientTimer = null;
 
-      // Meditative pentatonic scale in gold/champagne harmonic frequencies (Hz)
+      // Meditative pentatonic scale in rose-gold / crystal harmonic frequencies (Hz)
       this.frequencies = [
-        293.66, // D4
-        329.63, // E4
+        329.63, // E4 (Warm foundation)
         392.00, // G4
         440.00, // A4
-        523.25, // C5
-        587.33, // D5
+        493.88, // B4
+        587.33, // D5 (Rose shimmer)
         659.25, // E5
         783.99, // G5
-        880.00  // A5
+        880.00, // A5
+        987.77  // B5 (Crystalline top)
       ];
     }
 
@@ -51,8 +51,8 @@
       }
     }
 
-    // Play a crystal/gold bell chime with long warm sustain
-    playBell(freq, duration = 2.4, gainLevel = 0.08) {
+    // Play a crystal/rose-gold bell chime with long warm sustain
+    playBell(freq, duration = 2.5, gainLevel = 0.075) {
       this.init();
       if (!this.ctx) return;
 
@@ -81,10 +81,10 @@
     // Play a dual-tone celestial chord for wish revelation
     playCelestialChord() {
       this.init();
-      const chord = [392.00, 523.25, 659.25, 880.00];
+      const chord = [440.00, 587.33, 659.25, 880.00];
       chord.forEach((freq, idx) => {
         setTimeout(() => {
-          this.playBell(freq, 3.2, 0.07);
+          this.playBell(freq, 3.4, 0.065);
         }, idx * 160);
       });
     }
@@ -139,7 +139,7 @@
   }
 
   /* ==========================================================================
-     2. GOLD DUST CANVAS & CELESTIAL PARTICLE BURST
+     2. ROSE GOLD DUST CANVAS & CELESTIAL STARDUST BURST
      ========================================================================== */
   const canvas = document.getElementById('gold-dust-canvas');
   if (canvas) {
@@ -147,19 +147,21 @@
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    // Subtle drifting gold dust motes
+    // Drifting rose-gold motes
     const dustCount = Math.floor(Math.min(width, 1400) / 16);
     const dustParticles = [];
     const burstParticles = [];
 
-    const goldHues = [
-      'rgba(243, 229, 171, ', // Champagne
-      'rgba(212, 175, 55, ',  // Pure Gold
-      'rgba(201, 169, 106, ', // Muted Antique
-      'rgba(255, 244, 208, '  // Ivory Glow
+    // Haute Rose Gold & Satin Blush Palette
+    const roseHues = [
+      'rgba(255, 234, 230, ', // Champagne silk
+      'rgba(232, 165, 152, ', // Pure Rose Gold
+      'rgba(247, 214, 208, ', // Blush Quartz
+      'rgba(255, 204, 213, ', // Velvet Rose Glow
+      'rgba(212, 139, 126, '  // Warm Antique Rose
     ];
 
-    class DustMote {
+    class RoseDustMote {
       constructor() {
         this.reset();
       }
@@ -167,13 +169,13 @@
       reset() {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.radius = Math.random() * 1.5 + 0.4;
+        this.radius = Math.random() * 1.6 + 0.4;
         this.alpha = Math.random() * 0.5 + 0.15;
         this.speedY = -(Math.random() * 0.22 + 0.08); // Slow gentle upward rise
         this.speedX = (Math.random() - 0.5) * 0.15;
         this.pulseSpeed = Math.random() * 0.015 + 0.005;
         this.pulseDir = Math.random() > 0.5 ? 1 : -1;
-        this.color = goldHues[Math.floor(Math.random() * goldHues.length)];
+        this.color = roseHues[Math.floor(Math.random() * roseHues.length)];
       }
 
       update() {
@@ -181,9 +183,9 @@
         this.y += this.speedY;
 
         this.alpha += this.pulseSpeed * this.pulseDir;
-        if (this.alpha >= 0.7) {
+        if (this.alpha >= 0.72) {
           this.pulseDir = -1;
-        } else if (this.alpha <= 0.1) {
+        } else if (this.alpha <= 0.12) {
           this.pulseDir = 1;
         }
 
@@ -198,29 +200,29 @@
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fillStyle = this.color + this.alpha + ')';
         if (this.radius > 1.1) {
-          ctx.shadowBlur = 8;
-          ctx.shadowColor = this.color + '0.7)';
+          ctx.shadowBlur = 9;
+          ctx.shadowColor = this.color + '0.75)';
         }
         ctx.fill();
         ctx.shadowBlur = 0;
       }
     }
 
-    // Graceful golden stardust particle for the wish burst
-    class GoldStardustBurst {
+    // Graceful rose-gold stardust particle for the wish burst
+    class RoseStardustBurst {
       constructor(originX, originY) {
         this.x = originX;
         this.y = originY;
         const angle = Math.random() * Math.PI * 2;
         const velocity = Math.random() * 3.5 + 1.2;
         this.vx = Math.cos(angle) * velocity;
-        this.vy = Math.sin(angle) * velocity - 1.2; // Slight upward bias
+        this.vy = Math.sin(angle) * velocity - 1.2;
         this.gravity = 0.035;
         this.friction = 0.985;
         this.radius = Math.random() * 2.2 + 0.8;
         this.alpha = 1;
-        this.decay = Math.random() * 0.012 + 0.006; // Slow, cinematic fade
-        this.color = goldHues[Math.floor(Math.random() * goldHues.length)];
+        this.decay = Math.random() * 0.012 + 0.006;
+        this.color = roseHues[Math.floor(Math.random() * roseHues.length)];
       }
 
       update() {
@@ -238,7 +240,7 @@
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fillStyle = this.color + Math.max(0, this.alpha) + ')';
         ctx.shadowBlur = 12;
-        ctx.shadowColor = this.color + '0.8)';
+        ctx.shadowColor = this.color + '0.85)';
         ctx.fill();
         ctx.shadowBlur = 0;
       }
@@ -246,7 +248,7 @@
 
     // Populate ambient dust
     for (let i = 0; i < dustCount; i++) {
-      dustParticles.push(new DustMote());
+      dustParticles.push(new RoseDustMote());
     }
 
     function renderCanvas() {
@@ -278,10 +280,10 @@
       height = canvas.height = window.innerHeight;
     });
 
-    // Function to trigger the luxurious gold light burst
-    window.emitLuxuryGoldBurst = function (x, y, count = 75) {
+    // Function to trigger the luxurious rose gold light burst
+    window.emitLuxuryRoseBurst = function (x, y, count = 80) {
       for (let i = 0; i < count; i++) {
-        burstParticles.push(new GoldStardustBurst(x, y));
+        burstParticles.push(new RoseStardustBurst(x, y));
       }
     };
   }
@@ -302,18 +304,18 @@
     // Trigger celestial harmonic sound
     audioEngine.playCelestialChord();
 
-    // Calculate candle flame coordinates for golden particle release
+    // Calculate candle flame coordinates for rose gold particle release
     let originX = window.innerWidth / 2;
     let originY = window.innerHeight / 2;
 
     if (candleArtwork) {
       const rect = candleArtwork.getBoundingClientRect();
       originX = rect.left + rect.width / 2;
-      originY = rect.top + rect.height * 0.28; // At the flame
+      originY = rect.top + rect.height * 0.28;
     }
 
-    if (window.emitLuxuryGoldBurst) {
-      window.emitLuxuryGoldBurst(originX, originY, 90);
+    if (window.emitLuxuryRoseBurst) {
+      window.emitLuxuryRoseBurst(originX, originY, 95);
     }
 
     // Reveal soft quote message with transition
@@ -322,7 +324,7 @@
     }
 
     if (makeWishBtn) {
-      makeWishBtn.style.opacity = '0.5';
+      makeWishBtn.style.opacity = '0.55';
       makeWishBtn.style.pointerEvents = 'none';
       const text = makeWishBtn.querySelector('.btn-text');
       if (text) text.textContent = 'Wish Received ✨';
@@ -361,10 +363,10 @@
         const pitch = audioEngine.frequencies[(id * 2) % audioEngine.frequencies.length];
         audioEngine.playBell(pitch, 2.0, 0.08);
 
-        // Small stardust shimmer at the orb
+        // Small rose gold stardust shimmer at the orb
         const rect = orb.getBoundingClientRect();
-        if (window.emitLuxuryGoldBurst) {
-          window.emitLuxuryGoldBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 20);
+        if (window.emitLuxuryRoseBurst) {
+          window.emitLuxuryRoseBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 22);
         }
       }
     });
@@ -459,8 +461,8 @@
      ========================================================================== */
   window.addEventListener('load', () => {
     setTimeout(() => {
-      if (window.emitLuxuryGoldBurst) {
-        window.emitLuxuryGoldBurst(window.innerWidth / 2, window.innerHeight * 0.45, 25);
+      if (window.emitLuxuryRoseBurst) {
+        window.emitLuxuryRoseBurst(window.innerWidth / 2, window.innerHeight * 0.45, 25);
       }
     }, 900);
   });
