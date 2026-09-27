@@ -231,124 +231,143 @@
   /* ==========================================================================
      4. HIGH-RESOLUTION DYNAMIC 2D CANVAS TEXTURE GENERATOR
      ========================================================================== */
+
+  /**
+   * Word-wraps text inside a 2D canvas.
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {string} text
+   * @param {number} x      Center X (textAlign: 'center')
+   * @param {number} y      Starting baseline Y
+   * @param {number} maxWidth
+   * @param {number} lineHeight
+   * @returns {number}  Y after last line
+   */
+  function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+    const words = text.split(' ');
+    let line = '';
+    let cur = y;
+    for (let n = 0; n < words.length; n++) {
+      const test = line + words[n] + ' ';
+      if (ctx.measureText(test).width > maxWidth && n > 0) {
+        ctx.fillText(line.trim(), x, cur);
+        line = words[n] + ' ';
+        cur += lineHeight;
+      } else {
+        line = test;
+      }
+    }
+    if (line.trim()) {
+      ctx.fillText(line.trim(), x, cur);
+      cur += lineHeight;
+    }
+    return cur;
+  }
+
   function createFrontTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 1024;
     canvas.height = 1440;
     const ctx = canvas.getContext('2d');
 
-    // 1. Deep Midnight Purple Velvet Gradient
+    // Safe rails: 90px padding from each edge → 844px usable text width
+    const PAD   = 90;
+    const SAFE  = 1024 - PAD * 2;   // 844
+    const CX    = 512;
+
+    // 1. Background gradient
     const bgGrad = ctx.createLinearGradient(0, 0, 1024, 1440);
-    bgGrad.addColorStop(0, '#0c0614');
+    bgGrad.addColorStop(0,    '#0c0614');
     bgGrad.addColorStop(0.35, '#190a2a');
-    bgGrad.addColorStop(0.7, '#130722');
-    bgGrad.addColorStop(1, '#09040e');
+    bgGrad.addColorStop(0.7,  '#130722');
+    bgGrad.addColorStop(1,    '#09040e');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, 1024, 1440);
 
-    // 2. Ambient Internal Glow
-    const glowGrad = ctx.createRadialGradient(512, 540, 50, 512, 540, 500);
-    glowGrad.addColorStop(0, 'rgba(155, 89, 182, 0.28)');
-    glowGrad.addColorStop(0.5, 'rgba(108, 52, 131, 0.12)');
-    glowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    // 2. Ambient glow
+    const glowGrad = ctx.createRadialGradient(CX, 540, 50, CX, 540, 500);
+    glowGrad.addColorStop(0,   'rgba(155,89,182,0.28)');
+    glowGrad.addColorStop(0.5, 'rgba(108,52,131,0.12)');
+    glowGrad.addColorStop(1,   'rgba(0,0,0,0)');
     ctx.fillStyle = glowGrad;
     ctx.fillRect(0, 0, 1024, 1440);
 
-    // 3. Ornate Double Hairline Border with Art-Deco Corners
-    ctx.strokeStyle = 'rgba(180, 151, 214, 0.45)';
-    ctx.lineWidth = 2.5;
+    // 3. Double hairline border
+    ctx.strokeStyle = 'rgba(180,151,214,0.45)'; ctx.lineWidth = 2.5;
     ctx.strokeRect(40, 40, 944, 1360);
-
-    ctx.strokeStyle = 'rgba(180, 151, 214, 0.22)';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(180,151,214,0.22)'; ctx.lineWidth = 1;
     ctx.strokeRect(54, 54, 916, 1332);
 
-    // Corner Diamond Accents
-    const corners = [
-      [40, 40],
-      [984, 40],
-      [40, 1400],
-      [984, 1400]
-    ];
+    // Corner gems
     ctx.fillStyle = '#E8D5F5';
-    corners.forEach(([x, y]) => {
-      ctx.beginPath();
-      ctx.arc(x, y, 5, 0, Math.PI * 2);
-      ctx.fill();
+    [[40,40],[984,40],[40,1400],[984,1400]].forEach(([x,y]) => {
+      ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill();
     });
 
-    // 4. Celestial Star & Monogram Emblem
     ctx.textAlign = 'center';
 
-    // Top Kicker
-    ctx.font = '300 24px "Jost", sans-serif';
+    // 4. Top kicker
+    ctx.font = '300 22px "Jost", sans-serif';
     ctx.fillStyle = '#B497D6';
-    ctx.letterSpacing = '0.35em';
-    ctx.fillText('✦  A  T I M E L E S S  K E E P S A K E  ✦', 512, 150);
+    ctx.fillText('✦   A TIMELESS KEEPSAKE   ✦', CX, 140);
 
-    // Celestial Medallion Ring
-    ctx.strokeStyle = 'rgba(232, 213, 245, 0.6)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(512, 290, 80, 0, Math.PI * 2);
-    ctx.stroke();
-
-    ctx.strokeStyle = 'rgba(155, 89, 182, 0.4)';
-    ctx.setLineDash([4, 6]);
-    ctx.beginPath();
-    ctx.arc(512, 290, 95, 0, Math.PI * 2);
-    ctx.stroke();
+    // Celestial medallion rings
+    ctx.strokeStyle = 'rgba(232,213,245,0.6)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(CX, 290, 80, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = 'rgba(155,89,182,0.4)'; ctx.setLineDash([4,6]);
+    ctx.beginPath(); ctx.arc(CX, 290, 95, 0, Math.PI * 2); ctx.stroke();
     ctx.setLineDash([]);
 
-    // Core Monogram "H"
+    // Monogram H
     ctx.font = 'italic 500 86px "Cormorant Garamond", Georgia, serif';
     ctx.fillStyle = '#F5EFFF';
-    ctx.shadowColor = 'rgba(232, 213, 245, 0.7)';
-    ctx.shadowBlur = 25;
-    ctx.fillText('H', 512, 320);
+    ctx.shadowColor = 'rgba(232,213,245,0.7)'; ctx.shadowBlur = 25;
+    ctx.fillText('H', CX, 320);
     ctx.shadowBlur = 0;
 
-    // 5. Engraved Main Title: "Haya Madam G 🎀👀"
-    ctx.font = '400 32px "Jost", sans-serif';
+    // 5. Dedication kicker
+    ctx.font = '300 26px "Jost", sans-serif';
     ctx.fillStyle = '#B497D6';
-    ctx.fillText('D E D I C A T E D   T O', 512, 540);
+    ctx.fillText('D E D I C A T E D   T O', CX, 510);
 
-    ctx.font = 'italic 500 78px "Playfair Display", Georgia, serif';
+    // ── Her name ONLY — no "Madam G", no colorful emojis ──
+    ctx.font = 'italic 500 96px "Playfair Display", Georgia, serif';
     ctx.fillStyle = '#FFFFFF';
-    ctx.shadowColor = 'rgba(180, 151, 214, 0.85)';
-    ctx.shadowBlur = 35;
-    ctx.fillText('Haya Madam G 🎀👀', 512, 650);
+    ctx.shadowColor = 'rgba(180,151,214,0.9)'; ctx.shadowBlur = 40;
+    ctx.fillText('Haya', CX, 622);
     ctx.shadowBlur = 0;
 
-    // Elegant Sub-Heading
-    ctx.font = '300 30px "Jost", sans-serif';
+    // Subtle sparkle row beneath name (purple-lilac only)
+    ctx.font = '26px sans-serif';
     ctx.fillStyle = '#B497D6';
-    ctx.fillText('May 5th, 2009 • A Radiant Soul', 512, 730);
+    ctx.fillText('✦   ✧   ✦', CX, 678);
 
-    // Decorative Divider Line
-    ctx.strokeStyle = 'rgba(180, 151, 214, 0.45)';
-    ctx.lineWidth = 1.5;
+    // Sub-heading — wrapped
+    ctx.font = '300 28px "Jost", sans-serif';
+    ctx.fillStyle = '#B497D6';
+    wrapText(ctx, 'May 5th, 2009  •  A Radiant Soul', CX, 740, SAFE, 42);
+
+    // Divider
+    ctx.strokeStyle = 'rgba(180,151,214,0.45)'; ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(320, 820);
-    ctx.lineTo(460, 820);
-    ctx.moveTo(564, 820);
-    ctx.lineTo(704, 820);
+    ctx.moveTo(PAD + 80, 812); ctx.lineTo(CX - 60, 812);
+    ctx.moveTo(CX + 60, 812); ctx.lineTo(1024 - PAD - 80, 812);
     ctx.stroke();
+    ctx.font = '24px sans-serif'; ctx.fillStyle = '#E8D5F5';
+    ctx.fillText('✧ ✦ ✧', CX, 820);
 
-    ctx.font = '28px serif';
+    // Poetic inscription — WRAPPED within safe rails
+    ctx.font = 'italic 400 33px "Cormorant Garamond", Georgia, serif';
     ctx.fillStyle = '#E8D5F5';
-    ctx.fillText('✧ ✦ ✧', 512, 828);
+    wrapText(
+      ctx,
+      '\u201cA soul that quietly disarms the world with warmth, bringing light wherever you choose to step.\u201d',
+      CX, 900, SAFE, 54
+    );
 
-    // Poetic Front Inscription
-    ctx.font = 'italic 400 34px "Cormorant Garamond", Georgia, serif';
-    ctx.fillStyle = '#E8D5F5';
-    ctx.fillText('“A soul that quietly disarms the world with warmth,', 512, 940);
-    ctx.fillText('bringing light wherever you choose to step.”', 512, 995);
-
-    // Bottom Exploration Hint
-    ctx.font = '300 24px "Jost", sans-serif';
-    ctx.fillStyle = 'rgba(180, 151, 214, 0.65)';
-    ctx.fillText('✦   DRAG TO ROTATE & UNVEIL HER BLESSINGS   ✦', 512, 1310);
+    // Bottom hint — wrapped
+    ctx.font = '300 22px "Jost", sans-serif';
+    ctx.fillStyle = 'rgba(180,151,214,0.65)';
+    wrapText(ctx, '✦  DRAG TO ROTATE & UNVEIL HER BLESSINGS  ✦', CX, 1295, SAFE, 36);
 
     return new THREE.CanvasTexture(canvas);
   }
@@ -359,92 +378,117 @@
     canvas.height = 1440;
     const ctx = canvas.getContext('2d');
 
-    // 1. Deep Obsidian Purple Background
+    const PAD  = 90;
+    const SAFE = 1024 - PAD * 2;  // 844px usable
+    const CX   = 512;
+
+    // 1. Deep obsidian purple background
     const bgGrad = ctx.createLinearGradient(0, 0, 1024, 1440);
-    bgGrad.addColorStop(0, '#09040e');
+    bgGrad.addColorStop(0,   '#09040e');
     bgGrad.addColorStop(0.4, '#150824');
     bgGrad.addColorStop(0.8, '#1e0d33');
-    bgGrad.addColorStop(1, '#09040e');
+    bgGrad.addColorStop(1,   '#09040e');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, 1024, 1440);
 
-    // 2. Ambient Glow
-    const glowGrad = ctx.createRadialGradient(512, 600, 50, 512, 600, 500);
-    glowGrad.addColorStop(0, 'rgba(125, 60, 152, 0.32)');
-    glowGrad.addColorStop(0.6, 'rgba(108, 52, 131, 0.1)');
-    glowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    // 2. Ambient glow
+    const glowGrad = ctx.createRadialGradient(CX, 600, 50, CX, 600, 500);
+    glowGrad.addColorStop(0,   'rgba(125,60,152,0.32)');
+    glowGrad.addColorStop(0.6, 'rgba(108,52,131,0.1)');
+    glowGrad.addColorStop(1,   'rgba(0,0,0,0)');
     ctx.fillStyle = glowGrad;
     ctx.fillRect(0, 0, 1024, 1440);
 
-    // 3. Dual Borders
-    ctx.strokeStyle = 'rgba(180, 151, 214, 0.45)';
-    ctx.lineWidth = 2.5;
+    // 3. Double borders
+    ctx.strokeStyle = 'rgba(180,151,214,0.45)'; ctx.lineWidth = 2.5;
     ctx.strokeRect(40, 40, 944, 1360);
-
-    ctx.strokeStyle = 'rgba(180, 151, 214, 0.2)';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(180,151,214,0.2)';  ctx.lineWidth = 1;
     ctx.strokeRect(54, 54, 916, 1332);
+
+    // Corner gems
+    ctx.fillStyle = '#E8D5F5';
+    [[40,40],[984,40],[40,1400],[984,1400]].forEach(([x,y]) => {
+      ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill();
+    });
 
     ctx.textAlign = 'center';
 
-    // 4. Header Inscription
-    ctx.font = '300 24px "Jost", sans-serif';
+    // 4. Header kicker — wrapped for safety
+    ctx.font = '300 22px "Jost", sans-serif';
     ctx.fillStyle = '#B497D6';
-    ctx.fillText('✦   T H E   C E L E S T I A L   W I S H   ✦', 512, 150);
+    wrapText(ctx, '✦   THE CELESTIAL WISH   ✦', CX, 140, SAFE, 36);
 
-    // Radiant Moon & Star Icon
-    ctx.font = '54px serif';
+    // Celestial emblem — pure lilac sparkles, no colorful emojis
+    ctx.font = '52px sans-serif';
     ctx.fillStyle = '#E8D5F5';
-    ctx.shadowColor = 'rgba(180, 151, 214, 0.7)';
-    ctx.shadowBlur = 20;
-    ctx.fillText('🌙 ✨', 512, 260);
+    ctx.shadowColor = 'rgba(180,151,214,0.75)'; ctx.shadowBlur = 22;
+    ctx.fillText('✦  ✧  ✦', CX, 260);
     ctx.shadowBlur = 0;
 
-    // Headline
-    ctx.font = 'italic 500 68px "Playfair Display", Georgia, serif';
+    // Headline — wrapped
+    ctx.font = 'italic 500 66px "Playfair Display", Georgia, serif';
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillText('Timeless Radiance', 512, 380);
-
-    // Body Text Lines
-    ctx.font = '300 32px "Cormorant Garamond", Georgia, serif';
-    ctx.fillStyle = '#E8D5F5';
-    ctx.fillText('Some wishes refuse to be contained by a single day on the calendar.', 512, 520);
-    ctx.fillText('Though May 5th has quietly passed, the desire to celebrate your presence', 512, 575);
-    ctx.fillText('remains as radiant, steadfast, and bright as ever.', 512, 630);
-
-    // Highlight Quote
-    ctx.font = 'italic 500 38px "Cormorant Garamond", Georgia, serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.shadowColor = 'rgba(232, 213, 245, 0.6)';
-    ctx.shadowBlur = 18;
-    ctx.fillText('“May this year be gentle with your heart, generous with your dreams,', 512, 770);
-    ctx.fillText('and filled with magic you never saw coming.”', 512, 830);
+    ctx.shadowColor = 'rgba(232,213,245,0.5)'; ctx.shadowBlur = 20;
+    wrapText(ctx, 'Timeless Radiance', CX, 380, SAFE, 80);
     ctx.shadowBlur = 0;
 
-    // Second Verse
-    ctx.font = '300 32px "Cormorant Garamond", Georgia, serif';
+    // Body paragraph — WRAPPED
+    ctx.font = '300 30px "Cormorant Garamond", Georgia, serif';
     ctx.fillStyle = '#E8D5F5';
-    ctx.fillText('Never hurry who you are becoming. May each chapter grant you', 512, 970);
-    ctx.fillText('unshakeable peace, effortless joy, and pride in everything you are.', 512, 1025);
+    let afterBody = wrapText(
+      ctx,
+      'Some wishes refuse to be contained by a single day on the calendar. Though May 5th has quietly passed, the desire to celebrate your presence remains as radiant, steadfast, and bright as ever.',
+      CX, 510, SAFE, 46
+    );
 
-    // Closing Signature
-    ctx.font = 'italic 500 46px "Playfair Display", Georgia, serif';
+    // Divider
+    ctx.strokeStyle = 'rgba(180,151,214,0.4)'; ctx.lineWidth = 1;
+    const divY = afterBody + 20;
+    ctx.beginPath();
+    ctx.moveTo(PAD + 60, divY); ctx.lineTo(CX - 40, divY);
+    ctx.moveTo(CX + 40, divY); ctx.lineTo(1024 - PAD - 60, divY);
+    ctx.stroke();
+    ctx.font = '22px sans-serif'; ctx.fillStyle = '#B497D6';
+    ctx.fillText('✧ ✦ ✧', CX, divY + 8);
+
+    // Highlight quote — WRAPPED
+    ctx.font = 'italic 500 36px "Cormorant Garamond", Georgia, serif';
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillText('With warmth & highest admiration,', 512, 1160);
+    ctx.shadowColor = 'rgba(232,213,245,0.6)'; ctx.shadowBlur = 18;
+    let afterQuote = wrapText(
+      ctx,
+      '\u201cMay this year be gentle with your heart, generous with your dreams, and filled with magic you never saw coming.\u201d',
+      CX, divY + 60, SAFE, 54
+    );
+    ctx.shadowBlur = 0;
 
+    // Second verse — WRAPPED
+    ctx.font = '300 30px "Cormorant Garamond", Georgia, serif';
+    ctx.fillStyle = '#E8D5F5';
+    let afterVerse = wrapText(
+      ctx,
+      'Never hurry who you are becoming. May each chapter grant you unshakeable peace, effortless joy, and pride in everything you are.',
+      CX, afterQuote + 30, SAFE, 46
+    );
+
+    // Closing signature — wrapped
+    ctx.font = 'italic 500 44px "Playfair Display", Georgia, serif';
+    ctx.fillStyle = '#FFFFFF';
+    const sigY = Math.min(afterVerse + 60, 1155);
+    wrapText(ctx, 'With warmth & highest admiration,', CX, sigY, SAFE, 58);
+
+    // Dynamic date — wrapped
     const today = new Date();
     const dateFormatted = today.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+      year: 'numeric', month: 'long', day: 'numeric'
     });
-    ctx.font = '300 24px "Jost", sans-serif';
+    ctx.font = '300 22px "Jost", sans-serif';
     ctx.fillStyle = '#B497D6';
-    ctx.fillText(`Recorded on ${dateFormatted} • Timeless Tribute`, 512, 1230);
+    wrapText(ctx, `Recorded on ${dateFormatted}  •  Timeless Tribute`, CX, sigY + 70, SAFE, 34);
 
-    ctx.font = '24px serif';
-    ctx.fillStyle = '#E8D5F5';
-    ctx.fillText('✦   💜   ✦', 512, 1310);
+    // Footer gem row — pure lilac, no emoji
+    ctx.font = '26px sans-serif'; ctx.fillStyle = '#E8D5F5';
+    ctx.fillText('✦   ✧   ✦', CX, 1315);
 
     return new THREE.CanvasTexture(canvas);
   }
