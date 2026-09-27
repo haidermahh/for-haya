@@ -1116,7 +1116,7 @@ audio {
 	100% {
 		-ms-transform:translate(0px,0px);
 	}
-}o
+}
 @keyframes bannar_come {
 	0%{
 		transform:translate(0px,-1000px);
@@ -1333,51 +1333,64 @@ audio {
 }
 
 .message {
-  position: absolute;         /* take it out of flow */
-  top: 80%;                   /* center vertically */
-  left: 50%;                  /* center horizontally */
+  position: absolute;
+  top: 55%;
+  left: 50%;
   transform: translate(-50%, -50%);
-  width: 90%;                 /* adjust as needed */
+  width: 90%;
+  max-width: 800px;
   text-align: center;
-  display: none;              /* hidden until triggered */
-  z-index: 2000;              /* make sure it's above cake */
+  display: none;
+  z-index: 2000;
 }
 
 .message p {
-  font-family: 'Happy', sans-serif;
-  font-size: 60px;
+  font-family: 'Happy', 'Signika', cursive, sans-serif !important;
+  font-size: clamp(20px, 5.5vw, 52px);
   text-transform: uppercase;
   color: #C4515C;
-  text-shadow: 2px 2px 2px #FFF;
-  display: none;              /* controlled by JS */
+  text-shadow: 2px 2px 4px #FFF, 0 0 10px #FFF;
+  display: none;
   font-weight: bold;
-  margin: 15px 0;             /* spacing between lines */
+  margin: 10px 0;
+  line-height: 1.35;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.navbar-fixed-bottom {
+  padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+  pointer-events: none;
 }
 
 .btn-primary {
-        border-color: #466baf;
-        padding: 10px;
-        text-transform: uppercase;
-        font-family: 'Signika', sans-serif;
-        font-weight: 700;
-        color: #fff;
-        background-color: #466baf;
+  pointer-events: auto;
+  border-color: #466baf;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 30px !important;
+  padding: 10px 24px;
+  text-transform: uppercase;
+  font-family: 'Signika', sans-serif;
+  font-weight: 700;
+  font-size: clamp(13px, 3.4vw, 16px);
+  color: #fff;
+  background-color: #466baf;
+  box-shadow: 0 6px 20px rgba(70, 107, 175, 0.4);
+  transition: all 0.25s ease;
+  max-width: 90vw;
+  margin: 0 auto;
 }
-    .btn-primary:hover,
-    .btn-primary:focus,
-    .btn-primary:active,
-    .btn-primary.active,
-    .open .dropdown-toggle.btn-primary {
-        border-color: #fff;
-        color: #fff;
-        background-color: #466baf;
-    }
-
-
-
-    /*controlling tablet width*/
-    /*@media only screen and (max-width: 720px){
-    	.container {
-    		-webkit-transform: scale(0.9);
-    	}
-    }*/
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active,
+.open .dropdown-toggle.btn-primary {
+  border-color: #fff;
+  color: #fff;
+  background-color: #3b5c98;
+  box-shadow: 0 8px 24px rgba(70, 107, 175, 0.6);
+  transform: translateY(-2px);
+}
+.btn-primary:active {
+  transform: scale(0.97);
+}

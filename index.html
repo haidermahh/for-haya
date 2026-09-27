@@ -288,32 +288,148 @@
   left: 0;
 }
 
-/* ============================================== Album
+/* ============================================== Album & Responsive Layout
 */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+  position: relative !important;
+}
+
 .album-photo {
   display: none;
   position: absolute;
-  width: 300px; /* looks like landscape photo */
   height: auto;
   border: 5px solid white;
   box-shadow: 0 6px 18px rgba(0,0,0,0.3);
   border-radius: 10px;
   transition: transform 0.3s ease;
+  cursor: pointer;
 }
 
 .album-photo:hover {
-  transform: scale(1.05) rotate(0deg);
-  z-index: 10;
+  transform: scale(1.06) rotate(0deg) !important;
+  z-index: 50 !important;
 }
 
-/* Left side */
-.album-left-1 { top: 30px; left: 50px; transform: rotate(-5deg); }
-.album-left-2 { top: 205px; left: 70px; transform: rotate(4deg); }
+/* Desktop (> 992px) */
+@media (min-width: 993px) {
+  .album-photo { width: 280px; }
+  .album-left-1  { top: 40px;  left: 3vw;  transform: rotate(-5deg); }
+  .album-left-2  { top: 250px; left: 4vw;  transform: rotate(4deg); }
+  .album-right-1 { top: 40px;  right: 3vw; transform: rotate(5deg); }
+  .album-right-2 { top: 250px; right: 4vw; transform: rotate(-4deg); }
+  .can-zoom {
+    display: none;
+    position: absolute;
+    right: 5vw;
+    top: 460px;
+    width: 170px;
+    z-index: 6;
+  }
+}
 
-/* Right side */
-.album-right-1 { top: 30px; right: 50px; transform: rotate(5deg); }
-.album-right-2 { top: 205px; right: 70px; transform: rotate(-4deg); }
+/* Tablet (768px - 992px) */
+@media (min-width: 768px) and (max-width: 992px) {
+  .album-photo { width: 190px; border-width: 4px; }
+  .album-left-1  { top: 40px;  left: 15px; transform: rotate(-4deg); }
+  .album-left-2  { top: 210px; left: 20px; transform: rotate(3deg); }
+  .album-right-1 { top: 40px;  right: 15px; transform: rotate(4deg); }
+  .album-right-2 { top: 210px; right: 20px; transform: rotate(-3deg); }
+  .can-zoom {
+    display: none;
+    position: absolute;
+    right: 25px;
+    top: 380px;
+    width: 140px;
+    z-index: 6;
+  }
+  .cake {
+    transform: scale(0.85);
+    transform-origin: center top;
+  }
+}
 
+/* Mobile Devices (<= 767px) - Android & iPhone */
+@media (max-width: 767px) {
+  .album-photo {
+    width: clamp(105px, 29vw, 135px);
+    border: 3px solid white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 5;
+  }
+  .album-left-1  { top: 55px;  left: 6px;  transform: rotate(-4deg); }
+  .album-left-2  { top: 175px; left: 6px;  transform: rotate(3deg); }
+  .album-right-1 { top: 55px;  right: 6px; transform: rotate(4deg); }
+  .album-right-2 { top: 175px; right: 6px; transform: rotate(-3deg); }
+  .can-zoom {
+    display: none;
+    position: absolute;
+    right: 8px;
+    top: 295px;
+    width: 110px;
+    z-index: 6;
+  }
+  .bannar {
+    max-width: 82% !important;
+    margin: 0 auto;
+  }
+  .cake {
+    transform: scale(0.72);
+    transform-origin: center top;
+    z-index: 10;
+  }
+  .profile-img {
+    display: none !important; /* Hide offscreen persona on mobile to prevent overflow */
+  }
+  .bulb {
+    width: 40px;
+    height: 40px;
+    background-size: 40px 40px;
+  }
+  .bulb-holder {
+    height: 55px;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+  .message {
+    top: 52% !important;
+    width: 95% !important;
+    max-width: 420px;
+    padding: 0 10px;
+  }
+  .message p {
+    font-size: clamp(20px, 5.5vw, 34px) !important;
+    line-height: 1.35 !important;
+    margin: 8px 0 !important;
+    text-shadow: 2px 2px 3px #FFF, 0 0 8px #FFF !important;
+  }
+  .navbar-fixed-bottom {
+    padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+  }
+  .navbar-fixed-bottom .btn-primary {
+    border-radius: 30px !important;
+    padding: 10px 22px !important;
+    font-size: clamp(13px, 3.4vw, 15px) !important;
+    box-shadow: 0 6px 20px rgba(70, 107, 175, 0.5) !important;
+  }
+}
+
+/* Very Small Mobile (<= 360px) */
+@media (max-width: 360px) {
+  .album-photo { width: 95px; border-width: 2.5px; }
+  .album-left-1  { top: 50px;  left: 2px; }
+  .album-left-2  { top: 155px; left: 2px; }
+  .album-right-1 { top: 50px;  right: 2px; }
+  .album-right-2 { top: 155px; right: 2px; }
+  .can-zoom { width: 90px; top: 260px; right: 4px; }
+  .cake {
+    transform: scale(0.62);
+    transform-origin: center top;
+  }
+}
 
 /* ============================================== TEXT
 */
