@@ -447,6 +447,13 @@
         closeAllOrbs();
       });
     }
+
+    const messageCard = wrapper.querySelector('.orb-message-card');
+    if (messageCard) {
+      messageCard.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+    }
   });
 
   // Close opened orb card when clicking outside or on backdrop
