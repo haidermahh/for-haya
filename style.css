@@ -1450,41 +1450,42 @@ main {
 .closing-section {
   position: relative;
   overflow: hidden;
+  padding: 5rem 1.5rem 4rem;
 }
 
 .closing-section::before {
   content: '';
   position: absolute;
-  top: 30%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 600px;
-  height: 600px;
+  width: 580px;
+  height: 580px;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--rose-glow) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--rose-glow) 0%, transparent 68%);
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0.35;
 }
 
 .closing-card {
   width: 100%;
-  max-width: 720px;
+  max-width: 660px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2.6rem;
-  padding: 4rem 2rem;
-  background: var(--bg-card);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--hairline-rose);
-  border-radius: 32px;
+  gap: 1.8rem;
+  padding: 3rem clamp(1.8rem, 5vw, 3.2rem) 2.6rem;
+  background: radial-gradient(ellipse at 50% 0%, var(--card-glow-1) 0%, rgba(14, 10, 20, 0.90) 80%);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--hairline-rose-strong);
+  border-radius: 28px;
   box-shadow: 
     0 2px 0 0 var(--hairline-rose),
-    0 24px 60px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 var(--hairline-white),
-    0 0 80px rgba(0,0,0,0.25);
+    0 24px 60px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 0 50px var(--rose-glow);
   position: relative;
 }
 
@@ -1502,14 +1503,22 @@ main {
 .closing-seal-line {
   display: flex;
   align-items: center;
-  gap: 1.6rem;
+  gap: 0.8rem;
   width: 100%;
   justify-content: center;
 }
 
+.seal-kicker {
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--rose-soft);
+  font-weight: 400;
+}
+
 .seal-line-stem {
   flex: 1;
-  max-width: 80px;
+  max-width: 50px;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--hairline-rose-strong));
 }
@@ -1520,86 +1529,118 @@ main {
 
 .seal-gem {
   color: var(--rose-primary);
-  font-size: 0.9rem;
+  font-size: 0.75rem;
+  opacity: 0.85;
 }
 
 .closing-headline {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 4.5vw, 3rem);
-  font-weight: 400;
-  font-style: italic;
+  font-size: clamp(2.2rem, 4.5vw, 3rem);
+  font-weight: 300;
   color: var(--text-ivory);
-  line-height: 1.3;
-  letter-spacing: -0.01em;
+  line-height: 1.22;
+  letter-spacing: -0.015em;
 }
 
-.pulsing-heart-monogram {
-  width: 48px;
-  height: 48px;
+/* Luminous Heart Stage */
+.luminous-heart-stage {
+  position: relative;
+  width: 72px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--rose-glow);
+  margin: 0.2rem 0;
+}
+
+.heart-ambient-halo {
+  position: absolute;
+  inset: -12px;
   border-radius: 50%;
-  border: 1px solid var(--hairline-rose);
+  background: radial-gradient(circle, var(--rose-glow) 0%, transparent 70%);
+  animation: haloPulse 3s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.heart-pulse-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--hairline-rose-strong);
+  animation: orbRingPulse 2.8s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.pulsing-heart-monogram {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 35% 30%, var(--orb-core-1) 0%, var(--card-art-1) 85%);
+  border-radius: 50%;
+  border: 1px solid var(--hairline-rose-strong);
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.55),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4),
+    0 0 24px var(--rose-glow);
+  position: relative;
+  z-index: 2;
+  transition: transform 0.4s var(--ease-lux);
+}
+
+.pulsing-heart-monogram:hover {
+  transform: scale(1.1);
 }
 
 .gold-heart-svg {
   width: 28px;
   height: 28px;
-  animation: heartSlowPulse 3s var(--ease-in-out) infinite;
+  animation: heartSlowPulse 2.6s var(--ease-in-out) infinite;
+  filter: drop-shadow(0 0 8px var(--rose-glow));
 }
 
-.gold-heart-svg path {
-  stroke: var(--rose-primary);
+.closing-blessing-quote {
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.4vw, 1.35rem);
+  font-style: italic;
+  color: var(--text-cashmere);
+  line-height: 1.6;
+  max-width: 520px;
+  margin: 0 auto;
 }
 
 .dynamic-date-caption {
-  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.74rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--rose-soft);
   font-weight: 300;
-  line-height: 1.7;
+  line-height: 1.6;
   opacity: 0.85;
+  padding: 0.4rem 1.2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 9999px;
+  border: 1px solid var(--hairline-rose);
+}
+
+.date-diamond {
+  color: var(--rose-primary);
+  font-size: 0.75rem;
 }
 
 .closing-footer-actions {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 0.4rem;
 }
 
 .return-top-btn {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.7rem;
   text-decoration: none;
-  cursor: pointer;
-  opacity: 0.55;
-  transition: opacity var(--speed-fast) ease, transform var(--speed-fast) ease;
-  min-height: 48px;
-  min-width: 80px;
-  padding: 0.5rem 1.2rem;
-}
-
-.return-top-btn:hover {
-  opacity: 1;
-  transform: translateY(-2px);
-}
-
-.return-line {
-  width: 1px;
-  height: 32px;
-  background: linear-gradient(to top, var(--rose-primary), transparent);
-}
-
-.return-text {
-  font-size: 0.65rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--text-muted);
 }
 
 /* --------------------------------------------------
@@ -1817,13 +1858,13 @@ main {
 
   /* Closing */
   .closing-card {
-    padding: 3rem 1.8rem;
-    gap: 2.2rem;
+    padding: 2.4rem 1.4rem 2rem;
+    gap: 1.4rem;
     border-radius: 24px;
   }
 
   .closing-headline {
-    font-size: clamp(1.8rem, 5vw, 2.4rem);
+    font-size: clamp(1.8rem, 5vw, 2.2rem);
   }
 }
 
