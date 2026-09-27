@@ -1,91 +1,52 @@
-# 🕯️ For Haya — A Timeless Tribute ✨
+# 🔮 For Haya ✨ — 3D Interactive Celestial Keepsake
 
-An ultra-premium, cinematic digital tribute and belated birthday celebration website crafted for **Haya** (born May 5, 2009).
+A single-viewport, ultra-premium 3D WebGL interactive birthday gift experience crafted for **Haya** (born May 5, 2009).
 
-> *"Though the calendar page has turned, genuine wishes hold no expiration."*
+> *"Some wishes refuse to be bound by a calendar. Yours is already written across the stars."*
 
-Built with **pure HTML5, CSS3, and modern JavaScript** (zero build tools, zero frameworks, no bundlers). Deployable directly to **Vercel** or **Cloudflare Pages** in seconds with 100% static hosting.
-
----
-
-## ⚜️ Creative Direction & Aesthetic
-
-- **Primary Aesthetic**: Dark Charcoal & Deep Espresso backgrounds (`#08070A`, `#0C0B10`, `#15131C`) with rich, restrained **24K Gold-Foil accents** (`#D4AF37`, `#C9A96A`, `#FFF4D0`), cream/ivory text (`#F9F6F0`), and soft gold glow shadows.
-- **Dual Luxury Palettes**: Includes an instant aesthetic switcher in the top bar (`✦ Gold Foil` ⇄ `🌸 Rose Gold`) allowing you to enjoy both 24K Gold Foil and Haute Rose Gold Noir.
-- **Typography**: Editorial display in **Cormorant Garamond** (timeless serif display) paired with **Jost** (clean geometric sans-serif), loaded via Google Fonts.
-- **Micro-Interactions**: Slow custom cubic-bezier easing curves (`cubic-bezier(0.16, 1, 0.3, 1)`), subtle film grain texture, and slow-drifting gold dust motes.
-- **Belated Framing**: Crafted specifically with the understanding that her birthday has already passed this year—framing the message as an enduring, timeless celebration of her character, growth, and the luminous chapter ahead.
+Built with **pure HTML5, CSS3, and JavaScript with Three.js (via CDN)**. No build tools, no bundlers, zero external image dependencies. Ready for 1-click deployment on **Vercel** or **Cloudflare Pages**.
 
 ---
 
-## 🏛️ Sections Included
+## 💜 Aesthetic & Creative Direction
 
-1. **Hero Introduction (`#hero`)**:
-   - Small gold kicker line: `FOR HAYA • BORN MAY 5, 2009`.
-   - Large serif display headline: *"A Celebration of You"*.
-   - Thoughtful belated message acknowledging that wishes are timeless.
-   - Minimalist scroll prompt with a pulsing vertical gold hairline indicator.
-
-2. **A Moment to Celebrate (`#celebrate`)**:
-   - Minimalist line-art candle illustration in gold with an ethereal, softly swaying flame and ambient halo.
-   - Interactive button: **"Make a wish, even now"**.
-   - Triggers a slow, radial burst of shimmering gold light particles and reveals the quote:
-     > *“Some wishes don't need a date. Yours is already coming true.”*
-
-3. **Heartfelt Letter (`#letter`)**:
-   - Glassmorphism letter card with fine gold hairline dividers and a golden wax seal (`H`).
-   - Sincere, beautifully written words honoring her depth, kindness, and journey since May 5, 2009.
-   - Line-by-line cinematic fade-and-rise entrance animation powered by Intersection Observer.
-
-4. **Reflections of Grace Gallery (`#gallery`)**:
-   - 3 glass-framed memory cards with subtle 3D hover-tilt and deep gold/obsidian gradient placeholders.
-   - Marked with clear code comments showing where to drop in real `<img>` tags if desired.
-
-5. **Whispered Wishes Orbs (`#orbs`)**:
-   - 5 floating gold orbs orbiting gently on independent sinusoidal float paths.
-   - Tapping an orb smoothly expands it into a centered modal card with a blurred backdrop overlay, close button (`✕`), and tender blessing for her journey ahead.
-
-6. **Closing & Signature (`#closing`)**:
-   - Closing line: *"Made with love, thinking of you — always."* with a pulsing gold heart monogram.
-   - Dynamically generated date caption: *"Sent on [Current Date] — though the wish is timeless."*
-
-7. **Harmonic Sound Engine (Web Audio API)**:
-   - Built-in synthesizer that generates soft, meditative crystal chimes on demand.
-   - Zero external audio files—100% reliable offline, zero CORS or 404 errors.
-
----
-
-## 📱 Mobile Responsiveness Features
-
-- **Full Mobile Ergonomics**: Tested across mobile viewports (down to 320px width), with safe-area insets (`env(safe-area-inset-top)` / `env(safe-area-inset-bottom)`) for iPhone notch and gesture navigation bars.
-- **Dynamic Viewports**: Uses `min-height: 100svh` to prevent layout jumps when mobile address bars appear/disappear.
-- **Touch Optimization**: Smooth touch scrolling (`-webkit-overflow-scrolling: touch`), tap highlight removal (`-webkit-tap-highlight-color: transparent`), and accessible minimum 48px touch targets.
-- **Reduced Motion Support**: Built-in `@media (prefers-reduced-motion: reduce)` for accessibility.
+- **Single 3D Viewport**: Not a long scroll story — an intimate, immersive 3D digital keepsake she holds, drags, and explores with her hands.
+- **Strict Royal Purple & Amethyst Spectrum**: Completely zero gold or amber tones anywhere:
+  - Deep Amethyst & Royal Purple: `#6C3483`, `#7D3C98`
+  - Soft Orchid & Lavender: `#9B59B6`, `#B497D6`
+  - Pale Lilac & Starlight: `#E8D5F5`, `#F5EFFF`
+  - Midnight Obsidian Void: `#08040D`, `#0D0814`
+- **Living Particle Galaxy**: Thousands of glowing violet, lilac, and orchid motes drifting in 3D space with subtle mouse and gyro parallax reaction.
+- **Floating 3D Glass Keepsake Card**:
+  - Centerpiece 3D card gently floating with idle breathing animations and rim light.
+  - Multi-touch & mouse drag with momentum inertia to rotate 360° freely.
+  - **Front Face**: Dedicated to **"Haya Madam G 🎀👀"** in high-resolution engraved serif typography with celestial filigree.
+  - **Facets / Turns**: Unfolds poetic lines as she rotates through, revealing reflections on her quiet brilliance, unfolding horizons, and birthday blessings.
+  - **Back Face**: Timeless closing signature with dynamic current date.
+- **"Make a Wish" Particle Burst**: Tapping the glowing wish orb triggers a radial 3D stardust burst from the card and opens an illuminated blessing modal.
+- **Web Audio API Engine**: Built-in procedural harmonic synthesizer generating gentle ethereal ambient chimes (muted by default, autoplay-safe).
+- **Designer Signature**: Elegant subtle credit: *"Made With ❤️ By Haider — Turning code into feelings."*
 
 ---
 
 ## 🚀 3-Step Deployment Guide
 
-### Option 1: Vercel (Instant Drag & Drop)
-1. Go to [vercel.com](https://vercel.com) and log in.
-2. Click **"Add New..."** > **"Project"**.
-3. Drag and drop the `Wish` folder into the upload window, and click **Deploy**. Your site will be live instantly with a free HTTPS `.vercel.app` URL.
+### Option 1: Vercel (Recommended)
+1. Go to [vercel.com](https://vercel.com) and log in with your GitHub account.
+2. Select **"Import Project"** from your GitHub repository `haidermahh/for-haya`.
+3. Keep all build settings at default (Framework Preset: **Other**, Build Command: empty, Output Directory: `.`), and click **Deploy**.
+   - Your site will deploy instantly with continuous deployment on every git push!
 
 ### Option 2: Cloudflare Pages
 1. Go to [dash.cloudflare.com](https://dash.cloudflare.com) and navigate to **Workers & Pages**.
-2. Click **Create application** > **Pages** > **Upload assets**.
-3. Name your project (e.g. `for-haya`), drop in the `Wish` folder, and click **Deploy site**.
+2. Click **Create application** > **Pages** > **Connect to Git** (or select **Upload assets** for drag-and-drop).
+3. Connect your `for-haya` repository, leave the build settings empty, and click **Save and Deploy**.
 
 ---
 
-## 📷 Swapping in Real Photos (Optional)
+## 📱 Mobile Performance & Optimization
 
-In `index.html`, locate **SECTION 4: MEMORY GALLERY SECTION (`#gallery`)**.
-
-Each card contains a comment:
-```html
-<!-- PHOTO SWAP PLACEHOLDER:
-     To swap in a real photograph, replace the div.gallery-art with:
-     <img src="your-photo.jpg" alt="Haya" class="gallery-photo"> -->
-```
-Place your photo in the directory and replace the `<div class="gallery-art ...">` element with your `<img>` tag. The rounded borders, glass frame, and hover effects will remain intact automatically.
+- **Dynamic Particle Throttling**: Particle counts dynamically scale between desktop (2,500) and mobile (1,000) for smooth 60fps performance on mid-range devices.
+- **Single-Finger Touch Drag**: Intuitive touch controls with inertia damping and tilt clamping.
+- **Fixed Viewport Architecture**: `height: 100svh; overflow: hidden;` prevents mobile browser chrome bounce and accidental scrolling.
+- **Dual Event Handlers**: All buttons listen for both `click` and `touchend` events to guarantee zero dropped interactions on touchscreens.

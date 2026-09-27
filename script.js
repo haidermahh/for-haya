@@ -1,564 +1,1082 @@
 /**
- * ==========================================================================
- * FOR HAYA — ULTRA-PREMIUM ROSE GOLD NOIR & SATIN BLUSH EXPERIENCE
- * Interactive JavaScript Engine:
- *  - Floating Rose Gold Stardust & Velvet Petal Particles
- *  - Slow Graceful Rose Gold Light Burst (Haute Luxury)
- *  - Minimalist Web Audio Harmonic Chime Synthesizer
- *  - Candle "Make a Wish, Even Now" Interactive Revelation
- *  - Floating Rose Quartz Wish Orbs Constellation
- *  - Cinematic Intersection Observer Scroll Reveals
- *  - Subtle 3D Perspective Tilt for Gallery Cards
- *  - Dynamic Timeless Date Formulation
- * ==========================================================================
+ * FOR HAYA — 3D LUXURY KEEPSAKE EXPERIENCE
+ * WebGL / Three.js Single-Viewport Engine
+ * Features:
+ *  - Fullscreen Living Particle Galaxy with Parallax
+ *  - Floating 3D Glass Keepsake Card with High-Res Canvas Textures
+ *  - Touch & Mouse 3D Inertia Drag Rotation
+ *  - Unfolding Multi-Facet Message Engine
+ *  - "Make a Wish" WebGL Particle Burst & Celestial Harmonic Sound
+ *  - Web Audio API Synthetic Ambient Soundscape
+ *  - Fully Responsive, Strict Amethyst/Orchid Palette
  */
 
 (function () {
   'use strict';
 
   /* ==========================================================================
-     1. HARMONIC AMBIENT CHIMES (WEB AUDIO API SYNTHESIZER)
+     1. COLOR PALETTE CONSTANTS (Strict Purple & Violet Spectrum)
      ========================================================================== */
-  class LuxuryAudioEngine {
+  const COLORS = {
+    bgVoid: 0x08040d,
+    bgDeep: 0x0d0814,
+    purpleRoyal: 0x6c3483,
+    purpleAmethyst: 0x7d3c98,
+    purpleOrchid: 0x9b59b6,
+    purpleSoft: 0xb497d6,
+    purpleLilac: 0xe8d5f5,
+    purpleCrystal: 0xf5efff,
+    purpleDark: 0x371848,
+    glowGems: ['#E8D5F5', '#B497D6', '#9B59B6', '#7D3C98', '#6C3483']
+  };
+
+  /* ==========================================================================
+     2. GLOBAL VARIABLES & STATE
+     ========================================================================== */
+  const container = document.getElementById('canvas-container');
+  const loadingScreen = document.getElementById('loading-screen');
+  const dragHint = document.getElementById('drag-hint');
+  const faceNavBtns = document.querySelectorAll('.face-nav-btn');
+  const makeWishBtn = document.getElementById('make-wish-btn');
+  const wishModal = document.getElementById('wish-modal');
+  const modalCloseBtn = document.getElementById('modal-close-btn');
+  const modalDismissBtn = document.getElementById('modal-dismiss-btn');
+  const modalBackdrop = document.getElementById('modal-backdrop');
+  const modalDateDisplay = document.getElementById('modal-date-display');
+  const soundToggleBtn = document.getElementById('sound-toggle-btn');
+  const soundBtnText = document.getElementById('sound-btn-text');
+
+  let scene, camera, renderer;
+  let cardMesh, cardGroup;
+  let galaxyPoints, galaxyGeometry, galaxyMaterial;
+  let burstPointsGroup = [];
+  let ambientLight, keyPointLight, fillPointLight, rimPointLight;
+
+  // Interaction State
+  let isDragging = false;
+  let prevPointerX = 0;
+  let prevPointerY = 0;
+  let targetRotationY = 0;
+  let targetRotationX = 0;
+  let currentRotationY = 0;
+  let currentRotationX = 0;
+  let velocityY = 0;
+  let velocityX = 0;
+  let isNavSnapping = false;
+  let currentFaceIndex = 0;
+  let hasInteracted = false;
+  let clock = new THREE.Clock();
+
+  // Mouse Parallax
+  let mouseX = 0;
+  let mouseY = 0;
+  let targetCameraX = 0;
+  let targetCameraY = 0;
+
+  // Facet Messages unfolded on rotation
+  const FACET_MESSAGES = [
+    {
+      index: 0,
+      angle: 0,
+      kicker: '✦ Face I • Genesis ✦',
+      title: 'Haya Madam G 🎀👀',
+      text: 'A radiant presence born May 5th, 2009 — carrying quiet grace and timeless warmth.'
+    },
+    {
+      index: 1,
+      angle: Math.PI / 2,
+      kicker: '✦ Face II • Grace ✦',
+      title: 'Quiet Brilliance',
+      text: 'You carry an effortless kindness that disarms the rush of the world and puts everyone at ease.'
+    },
+    {
+      index: 2,
+      angle: Math.PI,
+      kicker: '✦ Face III • The Journey ✦',
+      title: 'Unfolding Horizons',
+      text: 'Never rush who you are becoming. May every quiet hope you cherish find wings to soar.'
+    },
+    {
+      index: 3,
+      angle: (3 * Math.PI) / 2,
+      kicker: '✦ Face IV • The Blessing ✦',
+      title: 'Always Celebrated',
+      text: 'Happy Belated Birthday, Haya — some celebrations are too special for just one day.'
+    }
+  ];
+
+  /* ==========================================================================
+     3. WEB AUDIO API SYNTHETIC AMBIENT SOUND ENGINE
+     ========================================================================== */
+  class CelestialAudioEngine {
     constructor() {
       this.ctx = null;
       this.isPlaying = false;
-      this.ambientTimer = null;
-
-      // Meditative pentatonic scale in rose-gold / crystal harmonic frequencies (Hz)
-      this.frequencies = [
-        329.63, // E4 (Warm foundation)
-        392.00, // G4
-        440.00, // A4
-        493.88, // B4
-        587.33, // D5 (Rose shimmer)
-        659.25, // E5
-        783.99, // G5
-        880.00, // A5
-        987.77  // B5 (Crystalline top)
-      ];
+      this.ambientGain = null;
+      this.timer = null;
     }
 
     init() {
-      if (!this.ctx) {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (AudioContext) {
-          this.ctx = new AudioContext();
-        }
-      }
-      if (this.ctx && this.ctx.state === 'suspended') {
-        this.ctx.resume();
-      }
+      if (this.ctx) return;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      this.ctx = new AudioCtx();
     }
 
-    // Play a crystal/rose-gold bell chime with long warm sustain
-    playBell(freq, duration = 2.5, gainLevel = 0.075) {
+    startAmbient() {
       this.init();
       if (!this.ctx) return;
+      if (this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
 
-      try {
+      this.isPlaying = true;
+
+      // Master ambient gain
+      this.ambientGain = this.ctx.createGain();
+      this.ambientGain.gain.setValueAtTime(0.01, this.ctx.currentTime);
+      this.ambientGain.gain.exponentialRampToValueAtTime(0.25, this.ctx.currentTime + 3);
+      this.ambientGain.connect(this.ctx.destination);
+
+      // Warm purple drone pad (Amethyst Eb Minor / Gb major harmony)
+      const freqs = [155.56, 185.0, 233.08, 277.18, 311.13]; // Eb3, Gb3, Bb3, Db4, Eb4
+      freqs.forEach((freq, idx) => {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
 
-        osc.type = 'sine';
+        osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
         osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
 
-        // Soft, organic envelope (instant gentle swell, long exponential decay)
-        gain.gain.setValueAtTime(0.0001, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(gainLevel, this.ctx.currentTime + 0.08);
-        gain.gain.exponentialRampToValueAtTime(0.00001, this.ctx.currentTime + duration);
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(450 + idx * 80, this.ctx.currentTime);
 
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
+        gain.gain.setValueAtTime(0.035, this.ctx.currentTime);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ambientGain);
 
         osc.start();
-        osc.stop(this.ctx.currentTime + duration);
-      } catch (e) {
-        // Fallback gracefully
-      }
+      });
+
+      // Scheduled random celestial bell tones
+      this.scheduleNextChime();
     }
 
-    // Play a dual-tone celestial chord for wish revelation
-    playCelestialChord() {
+    scheduleNextChime() {
+      if (!this.isPlaying) return;
+      const delay = 3500 + Math.random() * 4000;
+      this.timer = setTimeout(() => {
+        if (this.isPlaying) {
+          this.playBellTone();
+          this.scheduleNextChime();
+        }
+      }, delay);
+    }
+
+    playBellTone(freq) {
+      if (!this.ctx) return;
+      const chimeFreqs = [622.25, 739.99, 830.61, 932.33, 1108.73, 1244.51];
+      const selected = freq || chimeFreqs[Math.floor(Math.random() * chimeFreqs.length)];
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(selected, this.ctx.currentTime);
+
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(selected, this.ctx.currentTime);
+      filter.Q.setValueAtTime(4.0, this.ctx.currentTime);
+
+      gain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.08, this.ctx.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 2.5);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 2.6);
+    }
+
+    playWishCelebration() {
       this.init();
-      const chord = [440.00, 587.33, 659.25, 880.00];
-      chord.forEach((freq, idx) => {
+      if (!this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+
+      // Sweeping celestial harp arpeggio
+      const notes = [311.13, 370.0, 466.16, 622.25, 739.99, 932.33, 1244.51];
+      notes.forEach((pitch, i) => {
         setTimeout(() => {
-          this.playBell(freq, 3.4, 0.065);
-        }, idx * 160);
+          this.playBellTone(pitch);
+        }, i * 90);
       });
     }
 
-    // Gentle ambient wind-chime progression
-    toggleAmbient(btn) {
-      this.init();
-      if (this.isPlaying) {
-        this.stopAmbient(btn);
-      } else {
-        this.startAmbient(btn);
-      }
-    }
-
-    startAmbient(btn) {
-      this.isPlaying = true;
-      if (btn) btn.classList.add('is-active');
-      const label = document.getElementById('audio-label-text');
-      if (label) label.textContent = 'Pause Chimes';
-      this.scheduleNextAmbientTone();
-    }
-
-    stopAmbient(btn) {
+    stopAmbient() {
       this.isPlaying = false;
-      if (this.ambientTimer) clearTimeout(this.ambientTimer);
-      if (btn) btn.classList.remove('is-active');
-      const label = document.getElementById('audio-label-text');
-      if (label) label.textContent = 'Ambient Chimes';
-    }
-
-    scheduleNextAmbientTone() {
-      if (!this.isPlaying) return;
-
-      const randomFreq = this.frequencies[Math.floor(Math.random() * this.frequencies.length)];
-      this.playBell(randomFreq, 2.8, 0.06);
-
-      // Organic interval between 2.5s and 5.5s
-      const delay = Math.random() * 3000 + 2500;
-      this.ambientTimer = setTimeout(() => {
-        this.scheduleNextAmbientTone();
-      }, delay);
+      if (this.timer) clearTimeout(this.timer);
+      if (this.ambientGain && this.ctx) {
+        this.ambientGain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 1);
+      }
     }
   }
 
-  const audioEngine = new LuxuryAudioEngine();
-
-  const audioToggleBtn = document.getElementById('audio-toggle-btn');
-  if (audioToggleBtn) {
-    audioToggleBtn.addEventListener('click', () => {
-      audioEngine.toggleAmbient(audioToggleBtn);
-    });
-  }
+  const audio = new CelestialAudioEngine();
 
   /* ==========================================================================
-     THEME TOGGLE ENGINE (24K GOLD FOIL <-> ROSE GOLD NOIR)
+     4. HIGH-RESOLUTION DYNAMIC 2D CANVAS TEXTURE GENERATOR
      ========================================================================== */
-  const themeToggleBtn = document.getElementById('theme-toggle-btn');
-  const themeLabel = document.getElementById('theme-label-text');
-  const themeIcon = document.getElementById('theme-icon');
-
-  let currentTheme = localStorage.getItem('haya_theme') || 'gold';
-  document.documentElement.setAttribute('data-theme', currentTheme);
-  updateThemeButtonUI();
-
-  function updateThemeButtonUI() {
-    if (currentTheme === 'rose') {
-      if (themeLabel) themeLabel.textContent = 'Rose Gold';
-      if (themeIcon) themeIcon.textContent = '🌸';
-    } else if (currentTheme === 'purple') {
-      if (themeLabel) themeLabel.textContent = 'Amethyst';
-      if (themeIcon) themeIcon.textContent = '💜';
-    } else {
-      if (themeLabel) themeLabel.textContent = 'Gold Foil';
-      if (themeIcon) themeIcon.textContent = '✦';
-    }
-  }
-
-  if (themeToggleBtn) {
-    themeToggleBtn.addEventListener('click', () => {
-      if (currentTheme === 'gold') currentTheme = 'rose';
-      else if (currentTheme === 'rose') currentTheme = 'purple';
-      else currentTheme = 'gold';
-      document.documentElement.setAttribute('data-theme', currentTheme);
-      try {
-        localStorage.setItem('haya_theme', currentTheme);
-      } catch (e) {}
-      updateThemeButtonUI();
-      // Soft chime upon theme switch
-      const chimeFreq = currentTheme === 'rose' ? 659.25 : currentTheme === 'purple' ? 783.99 : 523.25;
-      audioEngine.playBell(chimeFreq, 1.2, 0.05);
-    });
-  }
-
-  /* ==========================================================================
-     2. GOLD DUST CANVAS & CELESTIAL STARDUST BURST
-     ========================================================================== */
-  const canvas = document.getElementById('gold-dust-canvas');
-  if (canvas) {
+  function createFrontTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 1440;
     const ctx = canvas.getContext('2d');
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
 
-    // Drifting gold motes
-    const dustCount = Math.floor(Math.min(width, 1400) / 16);
-    const dustParticles = [];
-    const burstParticles = [];
+    // 1. Deep Midnight Purple Velvet Gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, 1024, 1440);
+    bgGrad.addColorStop(0, '#0c0614');
+    bgGrad.addColorStop(0.35, '#190a2a');
+    bgGrad.addColorStop(0.7, '#130722');
+    bgGrad.addColorStop(1, '#09040e');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, 1024, 1440);
 
-    function getActivePalette() {
-      if (currentTheme === 'rose') {
-        return [
-          'rgba(255, 234, 230, ',
-          'rgba(232, 165, 152, ',
-          'rgba(247, 214, 208, ',
-          'rgba(255, 204, 213, ',
-          'rgba(212, 139, 126, '
-        ];
-      }
-      if (currentTheme === 'purple') {
-        return [
-          'rgba(221, 214, 254, ', // Lavender quartz
-          'rgba(192, 132, 252, ', // Amethyst
-          'rgba(168, 85, 247, ',  // Deep violet
-          'rgba(245, 240, 255, ', // Pale orchid
-          'rgba(196, 181, 253, '  // Lilac silk
-        ];
-      }
-      return [
-        'rgba(243, 229, 171, ', // Champagne
-        'rgba(212, 175, 55, ',  // Pure 24K Gold
-        'rgba(201, 169, 106, ', // Muted Antique Gold
-        'rgba(255, 244, 208, ', // Ivory Glow
-        'rgba(230, 202, 133, '  // Gold Silk
-      ];
-    }
+    // 2. Ambient Internal Glow
+    const glowGrad = ctx.createRadialGradient(512, 540, 50, 512, 540, 500);
+    glowGrad.addColorStop(0, 'rgba(155, 89, 182, 0.28)');
+    glowGrad.addColorStop(0.5, 'rgba(108, 52, 131, 0.12)');
+    glowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = glowGrad;
+    ctx.fillRect(0, 0, 1024, 1440);
 
-    class RoseDustMote {
-      constructor() {
-        this.reset();
-      }
+    // 3. Ornate Double Hairline Border with Art-Deco Corners
+    ctx.strokeStyle = 'rgba(180, 151, 214, 0.45)';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(40, 40, 944, 1360);
 
-      reset() {
-        const palette = getActivePalette();
-        this.x = Math.random() * width;
-        this.y = Math.random() * height;
-        this.radius = Math.random() * 1.6 + 0.4;
-        this.alpha = Math.random() * 0.5 + 0.15;
-        this.speedY = -(Math.random() * 0.22 + 0.08); // Slow gentle upward rise
-        this.speedX = (Math.random() - 0.5) * 0.15;
-        this.pulseSpeed = Math.random() * 0.015 + 0.005;
-        this.pulseDir = Math.random() > 0.5 ? 1 : -1;
-        this.color = palette[Math.floor(Math.random() * palette.length)];
-      }
+    ctx.strokeStyle = 'rgba(180, 151, 214, 0.22)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(54, 54, 916, 1332);
 
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-
-        this.alpha += this.pulseSpeed * this.pulseDir;
-        if (this.alpha >= 0.72) {
-          this.pulseDir = -1;
-        } else if (this.alpha <= 0.12) {
-          this.pulseDir = 1;
-        }
-
-        // Boundary wrap
-        if (this.y < -10) this.y = height + 10;
-        if (this.x < -10) this.x = width + 10;
-        if (this.x > width + 10) this.x = -10;
-      }
-
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color + this.alpha + ')';
-        if (this.radius > 1.1) {
-          ctx.shadowBlur = 9;
-          ctx.shadowColor = this.color + '0.75)';
-        }
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-    }
-
-    // Graceful gold stardust particle for the wish burst
-    class RoseStardustBurst {
-      constructor(originX, originY) {
-        const palette = getActivePalette();
-        this.x = originX;
-        this.y = originY;
-        const angle = Math.random() * Math.PI * 2;
-        const velocity = Math.random() * 3.5 + 1.2;
-        this.vx = Math.cos(angle) * velocity;
-        this.vy = Math.sin(angle) * velocity - 1.2;
-        this.gravity = 0.035;
-        this.friction = 0.985;
-        this.radius = Math.random() * 2.2 + 0.8;
-        this.alpha = 1;
-        this.decay = Math.random() * 0.012 + 0.006;
-        this.color = palette[Math.floor(Math.random() * palette.length)];
-      }
-
-      update() {
-        this.vx *= this.friction;
-        this.vy *= this.friction;
-        this.vy += this.gravity;
-        this.x += this.vx;
-        this.y += this.vy;
-        this.alpha -= this.decay;
-      }
-
-      draw() {
-        if (this.alpha <= 0) return;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color + Math.max(0, this.alpha) + ')';
-        ctx.shadowBlur = 12;
-        ctx.shadowColor = this.color + '0.85)';
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-    }
-
-    // Populate ambient dust
-    for (let i = 0; i < dustCount; i++) {
-      dustParticles.push(new RoseDustMote());
-    }
-
-    function renderCanvas() {
-      ctx.clearRect(0, 0, width, height);
-
-      // Render ambient dust
-      for (let i = 0; i < dustParticles.length; i++) {
-        dustParticles[i].update();
-        dustParticles[i].draw();
-      }
-
-      // Render active burst particles
-      for (let i = burstParticles.length - 1; i >= 0; i--) {
-        const p = burstParticles[i];
-        p.update();
-        p.draw();
-        if (p.alpha <= 0) {
-          burstParticles.splice(i, 1);
-        }
-      }
-
-      requestAnimationFrame(renderCanvas);
-    }
-
-    renderCanvas();
-
-    window.addEventListener('resize', () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+    // Corner Diamond Accents
+    const corners = [
+      [40, 40],
+      [984, 40],
+      [40, 1400],
+      [984, 1400]
+    ];
+    ctx.fillStyle = '#E8D5F5';
+    corners.forEach(([x, y]) => {
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
+      ctx.fill();
     });
 
-    // Function to trigger the luxurious rose gold light burst
-    window.emitLuxuryRoseBurst = function (x, y, count = 80) {
-      for (let i = 0; i < count; i++) {
-        burstParticles.push(new RoseStardustBurst(x, y));
-      }
-    };
+    // 4. Celestial Star & Monogram Emblem
+    ctx.textAlign = 'center';
+
+    // Top Kicker
+    ctx.font = '300 24px "Jost", sans-serif';
+    ctx.fillStyle = '#B497D6';
+    ctx.letterSpacing = '0.35em';
+    ctx.fillText('✦  A  T I M E L E S S  K E E P S A K E  ✦', 512, 150);
+
+    // Celestial Medallion Ring
+    ctx.strokeStyle = 'rgba(232, 213, 245, 0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(512, 290, 80, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(155, 89, 182, 0.4)';
+    ctx.setLineDash([4, 6]);
+    ctx.beginPath();
+    ctx.arc(512, 290, 95, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Core Monogram "H"
+    ctx.font = 'italic 500 86px "Cormorant Garamond", Georgia, serif';
+    ctx.fillStyle = '#F5EFFF';
+    ctx.shadowColor = 'rgba(232, 213, 245, 0.7)';
+    ctx.shadowBlur = 25;
+    ctx.fillText('H', 512, 320);
+    ctx.shadowBlur = 0;
+
+    // 5. Engraved Main Title: "Haya Madam G 🎀👀"
+    ctx.font = '400 32px "Jost", sans-serif';
+    ctx.fillStyle = '#B497D6';
+    ctx.fillText('D E D I C A T E D   T O', 512, 540);
+
+    ctx.font = 'italic 500 78px "Playfair Display", Georgia, serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.shadowColor = 'rgba(180, 151, 214, 0.85)';
+    ctx.shadowBlur = 35;
+    ctx.fillText('Haya Madam G 🎀👀', 512, 650);
+    ctx.shadowBlur = 0;
+
+    // Elegant Sub-Heading
+    ctx.font = '300 30px "Jost", sans-serif';
+    ctx.fillStyle = '#B497D6';
+    ctx.fillText('May 5th, 2009 • A Radiant Soul', 512, 730);
+
+    // Decorative Divider Line
+    ctx.strokeStyle = 'rgba(180, 151, 214, 0.45)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(320, 820);
+    ctx.lineTo(460, 820);
+    ctx.moveTo(564, 820);
+    ctx.lineTo(704, 820);
+    ctx.stroke();
+
+    ctx.font = '28px serif';
+    ctx.fillStyle = '#E8D5F5';
+    ctx.fillText('✧ ✦ ✧', 512, 828);
+
+    // Poetic Front Inscription
+    ctx.font = 'italic 400 34px "Cormorant Garamond", Georgia, serif';
+    ctx.fillStyle = '#E8D5F5';
+    ctx.fillText('“A soul that quietly disarms the world with warmth,', 512, 940);
+    ctx.fillText('bringing light wherever you choose to step.”', 512, 995);
+
+    // Bottom Exploration Hint
+    ctx.font = '300 24px "Jost", sans-serif';
+    ctx.fillStyle = 'rgba(180, 151, 214, 0.65)';
+    ctx.fillText('✦   DRAG TO ROTATE & UNVEIL HER BLESSINGS   ✦', 512, 1310);
+
+    return new THREE.CanvasTexture(canvas);
+  }
+
+  function createBackTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 1440;
+    const ctx = canvas.getContext('2d');
+
+    // 1. Deep Obsidian Purple Background
+    const bgGrad = ctx.createLinearGradient(0, 0, 1024, 1440);
+    bgGrad.addColorStop(0, '#09040e');
+    bgGrad.addColorStop(0.4, '#150824');
+    bgGrad.addColorStop(0.8, '#1e0d33');
+    bgGrad.addColorStop(1, '#09040e');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, 1024, 1440);
+
+    // 2. Ambient Glow
+    const glowGrad = ctx.createRadialGradient(512, 600, 50, 512, 600, 500);
+    glowGrad.addColorStop(0, 'rgba(125, 60, 152, 0.32)');
+    glowGrad.addColorStop(0.6, 'rgba(108, 52, 131, 0.1)');
+    glowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = glowGrad;
+    ctx.fillRect(0, 0, 1024, 1440);
+
+    // 3. Dual Borders
+    ctx.strokeStyle = 'rgba(180, 151, 214, 0.45)';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(40, 40, 944, 1360);
+
+    ctx.strokeStyle = 'rgba(180, 151, 214, 0.2)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(54, 54, 916, 1332);
+
+    ctx.textAlign = 'center';
+
+    // 4. Header Inscription
+    ctx.font = '300 24px "Jost", sans-serif';
+    ctx.fillStyle = '#B497D6';
+    ctx.fillText('✦   T H E   C E L E S T I A L   W I S H   ✦', 512, 150);
+
+    // Radiant Moon & Star Icon
+    ctx.font = '54px serif';
+    ctx.fillStyle = '#E8D5F5';
+    ctx.shadowColor = 'rgba(180, 151, 214, 0.7)';
+    ctx.shadowBlur = 20;
+    ctx.fillText('🌙 ✨', 512, 260);
+    ctx.shadowBlur = 0;
+
+    // Headline
+    ctx.font = 'italic 500 68px "Playfair Display", Georgia, serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('Timeless Radiance', 512, 380);
+
+    // Body Text Lines
+    ctx.font = '300 32px "Cormorant Garamond", Georgia, serif';
+    ctx.fillStyle = '#E8D5F5';
+    ctx.fillText('Some wishes refuse to be contained by a single day on the calendar.', 512, 520);
+    ctx.fillText('Though May 5th has quietly passed, the desire to celebrate your presence', 512, 575);
+    ctx.fillText('remains as radiant, steadfast, and bright as ever.', 512, 630);
+
+    // Highlight Quote
+    ctx.font = 'italic 500 38px "Cormorant Garamond", Georgia, serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.shadowColor = 'rgba(232, 213, 245, 0.6)';
+    ctx.shadowBlur = 18;
+    ctx.fillText('“May this year be gentle with your heart, generous with your dreams,', 512, 770);
+    ctx.fillText('and filled with magic you never saw coming.”', 512, 830);
+    ctx.shadowBlur = 0;
+
+    // Second Verse
+    ctx.font = '300 32px "Cormorant Garamond", Georgia, serif';
+    ctx.fillStyle = '#E8D5F5';
+    ctx.fillText('Never hurry who you are becoming. May each chapter grant you', 512, 970);
+    ctx.fillText('unshakeable peace, effortless joy, and pride in everything you are.', 512, 1025);
+
+    // Closing Signature
+    ctx.font = 'italic 500 46px "Playfair Display", Georgia, serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('With warmth & highest admiration,', 512, 1160);
+
+    const today = new Date();
+    const dateFormatted = today.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    ctx.font = '300 24px "Jost", sans-serif';
+    ctx.fillStyle = '#B497D6';
+    ctx.fillText(`Recorded on ${dateFormatted} • Timeless Tribute`, 512, 1230);
+
+    ctx.font = '24px serif';
+    ctx.fillStyle = '#E8D5F5';
+    ctx.fillText('✦   💜   ✦', 512, 1310);
+
+    return new THREE.CanvasTexture(canvas);
+  }
+
+  function createEdgeTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 128;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+
+    const grad = ctx.createLinearGradient(0, 0, 128, 128);
+    grad.addColorStop(0, '#2b1040');
+    grad.addColorStop(0.5, '#7d3c98');
+    grad.addColorStop(1, '#1b082a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 128, 128);
+
+    ctx.strokeStyle = 'rgba(232, 213, 245, 0.4)';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(0, 0, 128, 128);
+
+    return new THREE.CanvasTexture(canvas);
+  }
+
+  function createGlowPointTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+
+    const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    grad.addColorStop(0.25, 'rgba(232, 213, 245, 0.9)');
+    grad.addColorStop(0.55, 'rgba(155, 89, 182, 0.45)');
+    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 64, 64);
+
+    return new THREE.CanvasTexture(canvas);
   }
 
   /* ==========================================================================
-     3. CANDLE "MAKE A WISH, EVEN NOW" INTERACTION
+     5. THREE.JS SCENE SETUP
      ========================================================================== */
-  const candleArtwork = document.getElementById('candle-artwork');
-  const makeWishBtn = document.getElementById('make-wish-btn');
-  const wishRevelationBox = document.getElementById('wish-revelation');
+  function initThreeScene() {
+    // 1. Scene
+    scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(COLORS.bgVoid, 0.024);
 
-  let wishActivated = false;
+    // 2. Camera
+    const aspect = window.innerWidth / window.innerHeight;
+    camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
+    updateCameraDistance();
 
-  function triggerWishCelebration() {
-    if (wishActivated) return;
-    wishActivated = true;
+    // 3. Renderer
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.25;
+    container.appendChild(renderer.domElement);
 
-    // Trigger celestial harmonic sound
-    audioEngine.playCelestialChord();
+    // 4. Lights (Strict Purple Spectrum)
+    ambientLight = new THREE.AmbientLight(0x4a256d, 1.4);
+    scene.add(ambientLight);
 
-    // Calculate candle flame coordinates for rose gold particle release
-    let originX = window.innerWidth / 2;
-    let originY = window.innerHeight / 2;
+    keyPointLight = new THREE.PointLight(COLORS.purpleSoft, 2.8, 35);
+    keyPointLight.position.set(5, 7, 8);
+    scene.add(keyPointLight);
 
-    if (candleArtwork) {
-      const rect = candleArtwork.getBoundingClientRect();
-      originX = rect.left + rect.width / 2;
-      originY = rect.top + rect.height * 0.28;
+    fillPointLight = new THREE.PointLight(COLORS.purpleRoyal, 2.2, 35);
+    fillPointLight.position.set(-6, -4, 6);
+    scene.add(fillPointLight);
+
+    rimPointLight = new THREE.PointLight(COLORS.purpleLilac, 3.2, 25);
+    rimPointLight.position.set(0, 5, -8);
+    scene.add(rimPointLight);
+
+    // 5. Living Particle Galaxy
+    createLivingGalaxy();
+
+    // 6. Floating Keepsake Card Centerpiece
+    createFloatingKeepsakeCard();
+
+    // Fade out loading screen smoothly once scene is ready
+    setTimeout(() => {
+      if (loadingScreen) {
+        loadingScreen.classList.add('is-loaded');
+      }
+    }, 600);
+  }
+
+  function updateCameraDistance() {
+    const isMobile = window.innerWidth < 768;
+    const isNarrow = window.innerWidth < 480;
+
+    if (isNarrow) {
+      camera.position.set(0, 0.2, 10.5);
+    } else if (isMobile) {
+      camera.position.set(0, 0.2, 9.2);
+    } else {
+      camera.position.set(0, 0.2, 7.8);
+    }
+  }
+
+  /* ==========================================================================
+     6. LIVING PARTICLE GALAXY
+     ========================================================================== */
+  function createLivingGalaxy() {
+    const isMobile = window.innerWidth < 768;
+    const count = isMobile ? 1000 : 2500; // Performance optimization for mid-range phones
+
+    galaxyGeometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    const scales = new Float32Array(count);
+
+    const palette = [
+      new THREE.Color(COLORS.purpleLilac),
+      new THREE.Color(COLORS.purpleSoft),
+      new THREE.Color(COLORS.purpleOrchid),
+      new THREE.Color(COLORS.purpleAmethyst),
+      new THREE.Color(0xd2b4de)
+    ];
+
+    for (let i = 0; i < count; i++) {
+      // Cylindrical/spherical soft galaxy dispersion
+      const radius = 6 + Math.pow(Math.random(), 1.5) * 35;
+      const theta = Math.random() * Math.PI * 2;
+      const y = (Math.random() - 0.5) * 28;
+
+      positions[i * 3] = radius * Math.cos(theta);
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = radius * Math.sin(theta);
+
+      const color = palette[Math.floor(Math.random() * palette.length)];
+      colors[i * 3] = color.r;
+      colors[i * 3 + 1] = color.g;
+      colors[i * 3 + 2] = color.b;
+
+      scales[i] = 0.5 + Math.random() * 1.5;
     }
 
-    if (window.emitLuxuryRoseBurst) {
-      window.emitLuxuryRoseBurst(originX, originY, 95);
+    galaxyGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    galaxyGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const glowTex = createGlowPointTexture();
+    galaxyMaterial = new THREE.PointsMaterial({
+      size: isMobile ? 0.35 : 0.42,
+      map: glowTex,
+      transparent: true,
+      opacity: 0.82,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    galaxyPoints = new THREE.Points(galaxyGeometry, galaxyMaterial);
+    scene.add(galaxyPoints);
+  }
+
+  /* ==========================================================================
+     7. FLOATING 3D GLASS KEEPSAKE CARD
+     ========================================================================== */
+  function createFloatingKeepsakeCard() {
+    cardGroup = new THREE.Group();
+    scene.add(cardGroup);
+
+    // Dimensions: luxury card proportions
+    const width = 3.3;
+    const height = 4.65;
+    const depth = 0.28;
+
+    const geometry = new THREE.BoxGeometry(width, height, depth, 4, 4, 2);
+
+    const frontTexture = createFrontTexture();
+    const backTexture = createBackTexture();
+    const edgeTexture = createEdgeTexture();
+
+    // Three.js Box Materials: [right, left, top, bottom, front, back]
+    const edgeMaterial = new THREE.MeshStandardMaterial({
+      color: COLORS.purpleOrchid,
+      roughness: 0.22,
+      metalness: 0.45,
+      emissive: COLORS.purpleDark,
+      emissiveIntensity: 0.6,
+      map: edgeTexture
+    });
+
+    const frontMaterial = new THREE.MeshStandardMaterial({
+      map: frontTexture,
+      roughness: 0.2,
+      metalness: 0.25,
+      emissive: COLORS.purpleDark,
+      emissiveIntensity: 0.25
+    });
+
+    const backMaterial = new THREE.MeshStandardMaterial({
+      map: backTexture,
+      roughness: 0.2,
+      metalness: 0.25,
+      emissive: COLORS.purpleDark,
+      emissiveIntensity: 0.25
+    });
+
+    const materials = [
+      edgeMaterial, // +X right
+      edgeMaterial, // -X left
+      edgeMaterial, // +Y top
+      edgeMaterial, // -Y bottom
+      frontMaterial, // +Z front (Haya Madam G)
+      backMaterial // -Z back (The Celestial Wish)
+    ];
+
+    cardMesh = new THREE.Mesh(geometry, materials);
+    cardGroup.add(cardMesh);
+
+    // Add a delicate outer frosted glass halo rim
+    const haloGeo = new THREE.BoxGeometry(width + 0.12, height + 0.12, depth + 0.04);
+    const haloMat = new THREE.MeshBasicMaterial({
+      color: COLORS.purpleLilac,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.18
+    });
+    const haloMesh = new THREE.Mesh(haloGeo, haloMat);
+    cardGroup.add(haloMesh);
+  }
+
+  /* ==========================================================================
+     8. PARTICLE BURST FOR "MAKE A WISH"
+     ========================================================================== */
+  function triggerParticleBurst() {
+    const burstCount = window.innerWidth < 768 ? 200 : 400;
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(burstCount * 3);
+    const velocities = [];
+    const colors = new Float32Array(burstCount * 3);
+
+    const palette = [
+      new THREE.Color(COLORS.purpleLilac),
+      new THREE.Color(COLORS.purpleSoft),
+      new THREE.Color(COLORS.purpleOrchid),
+      new THREE.Color(0xffffff)
+    ];
+
+    for (let i = 0; i < burstCount; i++) {
+      // Start at card center
+      positions[i * 3] = (Math.random() - 0.5) * 1.5;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 2;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 0.5;
+
+      // Spherical explosion velocities
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(Math.random() * 2 - 1);
+      const speed = 4 + Math.random() * 8;
+
+      velocities.push({
+        x: speed * Math.sin(phi) * Math.cos(theta),
+        y: speed * Math.sin(phi) * Math.sin(theta),
+        z: speed * Math.cos(phi),
+        drag: 0.94 + Math.random() * 0.04
+      });
+
+      const col = palette[Math.floor(Math.random() * palette.length)];
+      colors[i * 3] = col.r;
+      colors[i * 3 + 1] = col.g;
+      colors[i * 3 + 2] = col.b;
     }
 
-    // Reveal soft quote message with transition
-    if (wishRevelationBox) {
-      wishRevelationBox.classList.add('is-revealed');
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const mat = new THREE.PointsMaterial({
+      size: 0.55,
+      map: createGlowPointTexture(),
+      transparent: true,
+      opacity: 1.0,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    const burstPoints = new THREE.Points(geo, mat);
+    scene.add(burstPoints);
+
+    burstPointsGroup.push({
+      mesh: burstPoints,
+      velocities: velocities,
+      life: 1.0,
+      decay: 0.016
+    });
+
+    // Surge light intensity
+    if (keyPointLight) {
+      keyPointLight.intensity = 6.0;
+    }
+  }
+
+  /* ==========================================================================
+     9. INTERACTIVE TOUCH & DRAG ROTATION CONTROLS
+     ========================================================================= */
+  function onPointerDown(clientX, clientY) {
+    isDragging = true;
+    isNavSnapping = false;
+    prevPointerX = clientX;
+    prevPointerY = clientY;
+    velocityY = 0;
+    velocityX = 0;
+
+    if (!hasInteracted) {
+      hasInteracted = true;
+      if (dragHint) dragHint.classList.add('is-hidden');
+    }
+  }
+
+  function onPointerMove(clientX, clientY) {
+    if (!isDragging) {
+      // Track mouse for subtle parallax
+      mouseX = (clientX / window.innerWidth) * 2 - 1;
+      mouseY = -(clientY / window.innerHeight) * 2 + 1;
+      targetCameraX = mouseX * 0.6;
+      targetCameraY = mouseY * 0.4;
+      return;
     }
 
-    if (makeWishBtn) {
-      makeWishBtn.style.opacity = '0.55';
-      makeWishBtn.style.pointerEvents = 'none';
-      const text = makeWishBtn.querySelector('.btn-text');
-      if (text) text.textContent = 'Wish Received ✨';
+    const deltaX = clientX - prevPointerX;
+    const deltaY = clientY - prevPointerY;
+
+    prevPointerX = clientX;
+    prevPointerY = clientY;
+
+    // Rotation sensitivity
+    const sensitivity = 0.0075;
+    targetRotationY += deltaX * sensitivity;
+    targetRotationX += deltaY * sensitivity * 0.5;
+
+    // Clamp X tilt to keep card elegantly upright
+    targetRotationX = Math.max(-0.4, Math.min(0.4, targetRotationX));
+
+    velocityY = deltaX * sensitivity;
+    velocityX = deltaY * sensitivity * 0.5;
+  }
+
+  function onPointerUp() {
+    isDragging = false;
+  }
+
+  // Desktop Mouse Events
+  container.addEventListener('mousedown', (e) => onPointerDown(e.clientX, e.clientY));
+  window.addEventListener('mousemove', (e) => onPointerMove(e.clientX, e.clientY));
+  window.addEventListener('mouseup', onPointerUp);
+
+  // Mobile Touch Events (Single-finger drag)
+  container.addEventListener(
+    'touchstart',
+    (e) => {
+      if (e.touches.length === 1) {
+        onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    },
+    { passive: true }
+  );
+
+  window.addEventListener(
+    'touchmove',
+    (e) => {
+      if (e.touches.length === 1) {
+        onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    },
+    { passive: true }
+  );
+
+  window.addEventListener('touchend', onPointerUp, { passive: true });
+
+  /* ==========================================================================
+     10. FACE NAVIGATION DOCK & ROTATION SNAPPING
+     ========================================================================== */
+  function snapToFace(index) {
+    isNavSnapping = true;
+    currentFaceIndex = index;
+
+    // Calculate nearest equivalent angle to avoid spinning around unnecessarily
+    const targetAngle = FACET_MESSAGES[index].angle;
+    const currentAngle = targetRotationY;
+    const twoPi = Math.PI * 2;
+
+    // Normalize to closest rotation
+    const turns = Math.round((currentAngle - targetAngle) / twoPi);
+    targetRotationY = turns * twoPi + targetAngle;
+    targetRotationX = 0; // Level out tilt
+
+    // Update active state in nav dock
+    faceNavBtns.forEach((btn, idx) => {
+      btn.classList.toggle('is-active', idx === index);
+    });
+
+    // Sound chime on face select
+    audio.playBellTone(500 + index * 120);
+
+    if (!hasInteracted) {
+      hasInteracted = true;
+      if (dragHint) dragHint.classList.add('is-hidden');
+    }
+  }
+
+  faceNavBtns.forEach((btn) => {
+    const handleFaceSelect = (e) => {
+      e.stopPropagation();
+      const faceIdx = parseInt(btn.getAttribute('data-face') || '0', 10);
+      snapToFace(faceIdx);
+    };
+
+    btn.addEventListener('click', handleFaceSelect);
+    btn.addEventListener('touchend', handleFaceSelect, { passive: true });
+  });
+
+  // Calculate current active face based on rotation angle for HUD dock
+  function updateActiveFaceFromRotation() {
+    if (isNavSnapping) return;
+    const twoPi = Math.PI * 2;
+    let norm = (currentRotationY % twoPi + twoPi) % twoPi; // [0, 2pi)
+
+    let closestIndex = 0;
+    let minDiff = Infinity;
+
+    FACET_MESSAGES.forEach((facet) => {
+      let diff = Math.abs(norm - facet.angle);
+      if (diff > Math.PI) diff = twoPi - diff;
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIndex = facet.index;
+      }
+    });
+
+    if (closestIndex !== currentFaceIndex) {
+      currentFaceIndex = closestIndex;
+      faceNavBtns.forEach((btn, idx) => {
+        btn.classList.toggle('is-active', idx === closestIndex);
+      });
+    }
+  }
+
+  /* ==========================================================================
+     11. "MAKE A WISH" & MODAL CELEBRATION
+     ========================================================================== */
+  function openWishModal() {
+    // 1. Particle burst from card
+    triggerParticleBurst();
+
+    // 2. Play celestial sound chord
+    audio.playWishCelebration();
+
+    // 3. Open modal
+    if (wishModal) {
+      wishModal.classList.add('is-open');
+      wishModal.setAttribute('aria-hidden', 'false');
+    }
+
+    // Set dynamic date in modal
+    if (modalDateDisplay) {
+      const today = new Date();
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      modalDateDisplay.textContent = `Sent with love on ${today.toLocaleDateString('en-US', options)} • Timeless`;
+    }
+  }
+
+  function closeWishModal() {
+    if (wishModal) {
+      wishModal.classList.remove('is-open');
+      wishModal.setAttribute('aria-hidden', 'true');
     }
   }
 
   if (makeWishBtn) {
-    makeWishBtn.addEventListener('click', triggerWishCelebration);
-  }
-
-  if (candleArtwork) {
-    candleArtwork.addEventListener('click', triggerWishCelebration);
-  }
-
-  /* ==========================================================================
-     4. QUIET WISH ORBS CONSTELLATION INTERACTION
-     ========================================================================== */
-  const orbWrappers = document.querySelectorAll('.wish-orb-wrapper');
-  const orbBackdrop = document.getElementById('orb-backdrop');
-
-  function closeAllOrbs() {
-    orbWrappers.forEach((w) => w.classList.remove('is-open'));
-    if (orbBackdrop) orbBackdrop.classList.remove('is-active');
-  }
-
-  orbWrappers.forEach((wrapper) => {
-    const orb = wrapper.querySelector('.wish-orb');
-    const closeBtn = wrapper.querySelector('.orb-close-btn');
-
-    if (orb) {
-      orb.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isOpen = wrapper.classList.contains('is-open');
-
-        // Close all other open orbs first
-        closeAllOrbs();
-
-        if (!isOpen) {
-          wrapper.classList.add('is-open');
-          if (orbBackdrop) orbBackdrop.classList.add('is-active');
-
-          // Play gentle bell tone corresponding to orb id
-          const id = parseInt(wrapper.getAttribute('data-id') || '1', 10);
-          const pitch = audioEngine.frequencies[(id * 2) % audioEngine.frequencies.length];
-          audioEngine.playBell(pitch, 2.0, 0.08);
-
-          // Small rose gold stardust shimmer at the orb
-          const rect = orb.getBoundingClientRect();
-          if (window.emitLuxuryRoseBurst) {
-            window.emitLuxuryRoseBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 22);
-          }
-        }
-      });
-    }
-
-    if (closeBtn) {
-      closeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        closeAllOrbs();
-      });
-    }
-
-    const messageCard = wrapper.querySelector('.orb-message-card');
-    if (messageCard) {
-      messageCard.addEventListener('click', (e) => {
-        e.stopPropagation();
-      });
-    }
-  });
-
-  // Close opened orb card when clicking outside or on backdrop
-  if (orbBackdrop) {
-    orbBackdrop.addEventListener('click', closeAllOrbs);
-  }
-
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.wish-orb-wrapper')) {
-      closeAllOrbs();
-    }
-  });
-
-  // Close on Escape key for accessibility
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeAllOrbs();
-    }
-  });
-
-  /* ==========================================================================
-     5. CINEMATIC INTERSECTION OBSERVER SCROLL REVEALS
-     ========================================================================== */
-  const revealItems = document.querySelectorAll('.reveal-item');
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(
-      (entries, obs) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            obs.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.12,
-        rootMargin: '0px 0px -40px 0px'
-      }
-    );
-
-    revealItems.forEach((item) => observer.observe(item));
-  } else {
-    revealItems.forEach((item) => item.classList.add('is-visible'));
-  }
-
-  /* ==========================================================================
-     6. SUBTLE 3D PERSPECTIVE TILT (DESKTOP GALLERY CARDS)
-     ========================================================================== */
-  const galleryCards = document.querySelectorAll('.gallery-card');
-  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    galleryCards.forEach((card) => {
-      const frame = card.querySelector('.gallery-frame');
-      if (!frame) return;
-
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / centerY) * -5;
-        const rotateY = ((x - centerX) / centerX) * 5;
-
-        frame.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
-      });
-
-      card.addEventListener('mouseleave', () => {
-        frame.style.transform = '';
-      });
-    });
-  }
-
-  /* ==========================================================================
-     7. DYNAMIC BELATED / TIMELESS DATE DISPLAY
-     ========================================================================== */
-  const dateStringElem = document.getElementById('timeless-date-string');
-  if (dateStringElem) {
-    const today = new Date();
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    const formatted = today.toLocaleDateString('en-US', options);
-    dateStringElem.textContent = `Sent on ${formatted} — though the wish is timeless.`;
-  }
-
-  /* ==========================================================================
-     8. SMOOTH RETURN TO TOP
-     ========================================================================== */
-  const returnTopBtn = document.querySelector('.return-top-btn');
-  if (returnTopBtn) {
-    returnTopBtn.addEventListener('click', (e) => {
+    makeWishBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+      openWishModal();
+    });
+    makeWishBtn.addEventListener(
+      'touchend',
+      (e) => {
+        e.preventDefault();
+        openWishModal();
+      },
+      { passive: false }
+    );
+  }
+
+  if (modalCloseBtn) {
+    modalCloseBtn.addEventListener('click', closeWishModal);
+  }
+
+  if (modalDismissBtn) {
+    modalDismissBtn.addEventListener('click', closeWishModal);
+  }
+
+  if (modalBackdrop) {
+    modalBackdrop.addEventListener('click', closeWishModal);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeWishModal();
+  });
+
+  /* ==========================================================================
+     12. AUDIO TOGGLE CONTROLS
+     ========================================================================== */
+  if (soundToggleBtn) {
+    soundToggleBtn.addEventListener('click', () => {
+      if (!audio.isPlaying) {
+        audio.startAmbient();
+        soundToggleBtn.classList.add('is-active');
+        if (soundBtnText) soundBtnText.textContent = 'Mute Chimes';
+      } else {
+        audio.stopAmbient();
+        soundToggleBtn.classList.remove('is-active');
+        if (soundBtnText) soundBtnText.textContent = 'Ambient Chimes';
+      }
     });
   }
 
   /* ==========================================================================
-     9. GENTLE INITIAL WELCOME STARDUST (SUBTLE)
+     13. RENDER & ANIMATION LOOP
      ========================================================================== */
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      if (window.emitLuxuryRoseBurst) {
-        window.emitLuxuryRoseBurst(window.innerWidth / 2, window.innerHeight * 0.45, 25);
+  function animate() {
+    requestAnimationFrame(animate);
+
+    const delta = clock.getDelta();
+    const elapsedTime = clock.getElapsedTime();
+
+    // 1. Card Inertia and Smooth Rotation
+    if (!isDragging) {
+      // Apply momentum friction
+      targetRotationY += velocityY;
+      targetRotationX += velocityX;
+      velocityY *= 0.92;
+      velocityX *= 0.92;
+
+      // Gentle idle breathing floating motion when untouched
+      if (!isNavSnapping && Math.abs(velocityY) < 0.001) {
+        targetRotationY += 0.002; // Slow auto-orbit
       }
-    }, 900);
+    }
+
+    // Smooth lerp to target rotation
+    currentRotationY += (targetRotationY - currentRotationY) * (isNavSnapping ? 0.08 : 0.06);
+    currentRotationX += (targetRotationX - currentRotationX) * 0.08;
+
+    if (cardGroup) {
+      cardGroup.rotation.y = currentRotationY;
+      cardGroup.rotation.x = currentRotationX;
+
+      // Gentle vertical hover/floating bob
+      cardGroup.position.y = Math.sin(elapsedTime * 1.5) * 0.12;
+      cardGroup.rotation.z = Math.sin(elapsedTime * 0.8) * 0.02;
+    }
+
+    // Update active face state in HUD
+    updateActiveFaceFromRotation();
+
+    // 2. Galaxy Particles Slow Orbit & Wave
+    if (galaxyPoints) {
+      galaxyPoints.rotation.y = elapsedTime * 0.035;
+      galaxyPoints.rotation.x = Math.sin(elapsedTime * 0.02) * 0.05;
+    }
+
+    // 3. Parallax Camera Shift
+    camera.position.x += (targetCameraX - camera.position.x) * 0.05;
+    camera.position.y += (targetCameraY + 0.2 - camera.position.y) * 0.05;
+    camera.lookAt(0, 0, 0);
+
+    // 4. Smooth Light Recovery from Wish Surge
+    if (keyPointLight && keyPointLight.intensity > 2.8) {
+      keyPointLight.intensity += (2.8 - keyPointLight.intensity) * 0.04;
+    }
+
+    // 5. Update Particle Bursts
+    for (let i = burstPointsGroup.length - 1; i >= 0; i--) {
+      const burst = burstPointsGroup[i];
+      const posAttr = burst.mesh.geometry.attributes.position;
+      const positions = posAttr.array;
+
+      for (let j = 0; j < burst.velocities.length; j++) {
+        const vel = burst.velocities[j];
+        positions[j * 3] += vel.x * delta;
+        positions[j * 3 + 1] += vel.y * delta;
+        positions[j * 3 + 2] += vel.z * delta;
+
+        vel.x *= vel.drag;
+        vel.y *= vel.drag;
+        vel.z *= vel.drag;
+      }
+
+      posAttr.needsUpdate = true;
+
+      burst.life -= burst.decay;
+      burst.mesh.material.opacity = Math.max(0, burst.life);
+
+      if (burst.life <= 0) {
+        scene.remove(burst.mesh);
+        burst.mesh.geometry.dispose();
+        burst.mesh.material.dispose();
+        burstPointsGroup.splice(i, 1);
+      }
+    }
+
+    renderer.render(scene, camera);
+  }
+
+  /* ==========================================================================
+     14. WINDOW RESIZE HANDLING
+     ========================================================================== */
+  window.addEventListener('resize', () => {
+    if (!renderer || !camera) return;
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    updateCameraDistance();
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  });
+
+  /* ==========================================================================
+     15. INITIALIZATION
+     ========================================================================== */
+  window.addEventListener('DOMContentLoaded', () => {
+    initThreeScene();
+    animate();
   });
 })();
