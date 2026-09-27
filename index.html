@@ -71,14 +71,15 @@
 /* ============================================== BASE
 */
 .cake:after {
-  background: #ffffff;
-  border-radius: 300px;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 999px;
   content: "";
   position: absolute;
-  bottom: 0;
+  bottom: -4px;
   left: 0;
-  width: 300px;
+  width: 100%;
   height: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 /* ============================================== Candle
 */
@@ -329,56 +330,60 @@ html, body {
 /* Desktop (> 992px) */
 @media (min-width: 993px) {
   .album-photo {
-    width: clamp(210px, 17vw, 260px);
-    height: clamp(140px, 11vw, 175px);
+    width: clamp(210px, 16vw, 245px);
+    height: clamp(140px, 11vw, 165px);
   }
-  .album-left-1  { top: 35px;  left: 2.5vw; transform: rotate(-5deg); }
-  .album-left-2  { top: 225px; left: 3vw;   transform: rotate(4deg); }
-  .album-right-1 { top: 35px;  right: 2.5vw; transform: rotate(5deg); }
-  .album-right-2 { top: 225px; right: 3vw;  transform: rotate(-4deg); }
+  .album-left-1  { top: 40px;  left: 3.5vw; transform: rotate(-5deg); }
+  .album-left-2  { top: 350px; left: 3.5vw; transform: rotate(4deg); }
+  .album-right-1 { top: 40px;  right: 3.5vw; transform: rotate(5deg); }
+  .album-right-2 { top: 350px; right: 3.5vw; transform: rotate(-4deg); }
   .can-zoom {
     display: none;
     position: absolute;
-    right: 3.5vw;
-    top: 415px;
-    width: 145px;
+    right: 4.5vw;
+    top: 525px;
+    width: 135px;
     z-index: 6;
   }
+  .bannar {
+    max-width: 420px !important;
+    margin: 8px auto 0;
+  }
   .cake {
-    top: 160px;
+    top: 335px;
     transform: scale(0.92);
     transform-origin: center top;
   }
   .profile-img {
-    width: 110px;
-    height: 110px;
-    right: -125px;
-    bottom: 25px;
-    object-fit: cover;
+    display: none !important;
   }
 }
 
 /* Tablet (768px - 992px) */
 @media (min-width: 768px) and (max-width: 992px) {
   .album-photo {
-    width: 175px;
-    height: 118px;
+    width: 165px;
+    height: 112px;
     border-width: 4px;
   }
-  .album-left-1  { top: 40px;  left: 15px; transform: rotate(-4deg); }
-  .album-left-2  { top: 180px; left: 18px; transform: rotate(3deg); }
-  .album-right-1 { top: 40px;  right: 15px; transform: rotate(4deg); }
-  .album-right-2 { top: 180px; right: 18px; transform: rotate(-3deg); }
+  .album-left-1  { top: 45px;  left: 16px; transform: rotate(-4deg); }
+  .album-left-2  { top: 330px; left: 16px; transform: rotate(3deg); }
+  .album-right-1 { top: 45px;  right: 16px; transform: rotate(4deg); }
+  .album-right-2 { top: 330px; right: 16px; transform: rotate(-3deg); }
   .can-zoom {
     display: none;
     position: absolute;
-    right: 20px;
-    top: 310px;
-    width: 120px;
+    right: 18px;
+    top: 450px;
+    width: 110px;
     z-index: 6;
   }
+  .bannar {
+    max-width: 340px !important;
+    margin: 6px auto 0;
+  }
   .cake {
-    top: 150px;
+    top: 310px;
     transform: scale(0.82);
     transform-origin: center top;
   }
@@ -390,32 +395,32 @@ html, body {
 /* Mobile Devices (<= 767px) - Android & iPhone */
 @media (max-width: 767px) {
   .album-photo {
-    width: clamp(100px, 28vw, 130px);
-    height: clamp(72px, 20vw, 92px);
+    width: clamp(92px, 25vw, 115px);
+    height: clamp(66px, 18vw, 82px);
     border: 3px solid white;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     z-index: 5;
   }
   .album-left-1  { top: 55px;  left: 8px;  transform: rotate(-4deg); }
-  .album-left-2  { top: 160px; left: 8px;  transform: rotate(3deg); }
   .album-right-1 { top: 55px;  right: 8px; transform: rotate(4deg); }
-  .album-right-2 { top: 160px; right: 8px; transform: rotate(-3deg); }
+  .album-left-2  { top: 305px; left: 8px;  transform: rotate(3deg); }
+  .album-right-2 { top: 305px; right: 8px; transform: rotate(-3deg); }
   .can-zoom {
     display: none;
     position: absolute;
     right: 10px;
-    top: 265px;
-    width: 95px;
+    top: 395px;
+    width: 82px;
     z-index: 6;
   }
   .bannar {
-    max-width: 82% !important;
-    margin: 0 auto;
+    max-width: 58% !important;
+    margin: 4px auto 0 !important;
   }
   .cake {
-    top: 140px;
-    transform: scale(0.72);
+    top: 290px;
+    transform: scale(0.68);
     transform-origin: center top;
     z-index: 10;
   }
@@ -423,17 +428,17 @@ html, body {
     display: none !important;
   }
   .bulb {
-    width: 40px;
-    height: 40px;
-    background-size: 40px 40px;
+    width: 36px;
+    height: 36px;
+    background-size: 36px 36px;
   }
   .bulb-holder {
-    height: 55px;
+    height: 48px;
     padding-left: 2px;
     padding-right: 2px;
   }
   .message {
-    top: 50% !important;
+    top: 48% !important;
     width: 95% !important;
     max-width: 420px;
     padding: 0 10px;
@@ -458,18 +463,18 @@ html, body {
 /* Very Small Mobile (<= 360px) */
 @media (max-width: 360px) {
   .album-photo {
-    width: 95px;
-    height: 68px;
-    border-width: 2.5px;
+    width: 82px;
+    height: 58px;
+    border-width: 2px;
   }
   .album-left-1  { top: 50px;  left: 4px; }
-  .album-left-2  { top: 145px; left: 4px; }
   .album-right-1 { top: 50px;  right: 4px; }
-  .album-right-2 { top: 145px; right: 4px; }
-  .can-zoom { width: 85px; top: 235px; right: 6px; }
+  .album-left-2  { top: 285px; left: 4px; }
+  .album-right-2 { top: 285px; right: 4px; }
+  .can-zoom { width: 72px; top: 350px; right: 4px; }
   .cake {
-    top: 130px;
-    transform: scale(0.62);
+    top: 270px;
+    transform: scale(0.6);
     transform-origin: center top;
   }
 }
@@ -584,7 +589,6 @@ p {
 				    <div class="fuego"></div>
 				  </div>
 				  <div class="cobertura"></div>
-          <img src="assets/images/person.png" class="profile-img">
 				  <div class="bizcocho"></div>
 				</div>
 			</div>

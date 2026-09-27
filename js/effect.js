@@ -15,13 +15,11 @@ $('document').ready(function(){
 			// Mobile devices (Android, iPhone)
 			var pad = 6;
 			var availW = winW - (pad * 2);
-			var balloonW = Math.max(38, Math.min(48, Math.floor((availW - 12) / 7)));
+			var balloonW = Math.max(36, Math.min(44, Math.floor((availW - 10) / 7)));
 			var balloonH = Math.round(balloonW * 1.83);
 			var spacing = Math.floor((availW - balloonW) / 6);
 			var startLeft = pad;
-			var topPos = Math.round($(window).height() * 0.24);
-			if (topPos < 110) topPos = 110;
-			if (topPos > 200) topPos = 200;
+			var topPos = 175; // Sits in the clear band between top photos (55-137px) and bottom photos (305-387px)
 
 			$('.balloons').css({
 				'width': balloonW + 'px',
@@ -39,13 +37,13 @@ $('document').ready(function(){
 					left: Math.round(startLeft + (i * spacing))
 				}, duration);
 			}
-		} else if (winW <= 768) {
+		} else if (winW <= 992) {
 			// Tablets
-			var balloonW = 68;
+			var balloonW = 60;
 			var balloonH = Math.round(balloonW * 1.83);
 			var spacing = Math.floor((winW - 60) / 7);
 			var startLeft = Math.round((winW - (spacing * 6 + balloonW)) / 2);
-			var topPos = 180;
+			var topPos = 185;
 
 			$('.balloons').css({
 				'width': balloonW + 'px',
@@ -53,7 +51,7 @@ $('document').ready(function(){
 				'background-size': balloonW + 'px ' + balloonH + 'px'
 			});
 			$('.balloons h2').css({
-				'font-size': '34px',
+				'font-size': '30px',
 				'line-height': 'normal'
 			});
 
@@ -65,21 +63,27 @@ $('document').ready(function(){
 			}
 		} else {
 			// Desktop & Laptop
+			var balloonW = 75;
+			var balloonH = Math.round(balloonW * 1.83);
+			var spacing = 80;
+			var totalW = spacing * 6 + balloonW;
+			var startLeft = Math.round(vw - (totalW / 2));
+			var topPos = 190; // Sits below top banner/photos (40-195px) and above bottom photos (350-515px)
+
 			$('.balloons').css({
-				'width': '100px',
-				'height': '183px',
-				'background-size': '100px 183px'
+				'width': balloonW + 'px',
+				'height': balloonH + 'px',
+				'background-size': balloonW + 'px ' + balloonH + 'px'
 			});
 			$('.balloons h2').css({
-				'font-size': '52px',
+				'font-size': '38px',
 				'line-height': 'normal'
 			});
 
-			var offsets = [-350, -250, -150, -50, 50, 150, 250];
 			for (var i = 0; i < 7; i++) {
 				$(balloons[i]).stop().animate({
-					top: 240,
-					left: Math.round(vw + offsets[i])
+					top: topPos,
+					left: Math.round(startLeft + (i * spacing))
 				}, duration);
 			}
 		}
