@@ -5,18 +5,18 @@
 <!--[if gt IE 8]> <html> <![endif]-->
 <!--[if !IE]><!--><html lang="en"><!-- <![endif]-->
 <head>
-	<title>Happy Birthday</title>
+	<title>Happy Birthday Haya</title>
 	<meta charset="UTF-8" />
-	<meta name="description" content="Happy Birthday Anggie">
+	<meta name="description" content="Happy Birthday Haya">
 	<meta name="robots" content="index, follow" />
   <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
-	<link rel="author" href="alex" /> 
-    <meta name="keywords" content="Birthday, Happy">
+	<link rel="author" href="Haider" /> 
+    <meta name="keywords" content="Birthday, Happy, Haya">
 
-    <!-- Strat of Facebook Meta -->
+    <!-- Start of Facebook Meta -->
     <meta property="og:type" content="E-Greeting" />
-    <meta property="og:image" content="favicon.ico" />
-    <meta property="og:description" content="Wish you a very Happy Birthday">
+    <meta property="og:image" content="assets/images/favicon.ico" />
+    <meta property="og:description" content="Wish you a very Happy Birthday Haya">
     <!-- End of Facebook Meta Tags -->
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
@@ -26,10 +26,37 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="css/stylesheet.css">
 	<link rel="stylesheet" type="text/css" href="css/loading.css">
-	<link href='https://fonts.googleapis.com/css?family=Signika' rel='stylesheet' type='text/css'>
-	<!-- <link href='https://fonts.googleapis.com/css?family=Nunito' rel='stylesheet' type='text/css'> -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet/less" href="cake.less"> 
 	<style type="text/css" id="less:birthday-cake">
+@font-face {
+  font-family: 'Happy';
+  src: url('assets/fonts/Sweet-Toffee.ttf') format('truetype'),
+       url('assets/fonts/Happy.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Signika';
+  src: url('assets/fonts/Happy.ttf') format('truetype'),
+       url('assets/fonts/Sweet-Toffee.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+.balloons h2 {
+  font-family: 'Happy', 'Signika', 'Signika Negative', cursive, sans-serif !important;
+  font-weight: bold !important;
+  font-size: 52px !important;
+  color: #BF4136;
+  text-shadow: 2px 2px 4px rgba(255,255,255,0.95), 0 0 10px rgba(255,255,255,0.85);
+}
+.message p {
+  font-family: 'Happy', 'Signika', sans-serif !important;
+}
     
     /* ============================================== POSITION
 */
@@ -320,10 +347,10 @@ p {
 
 <body>
 	<div class="loading"></div>
-  <img src="assets/images/photo1.jpg" class="album-photo album-left-1">
-  <img src="assets/images/photo2.jpg" class="album-photo album-left-2">
-  <img src="assets/images/photo3.jpg" class="album-photo album-right-1">
-  <img src="assets/images/photo4.jpg" class="album-photo album-right-2">
+  <img src="assets/images/photo1.jpg" class="album-photo album-left-1" alt="Photo 1">
+  <img src="assets/images/photo2.jpg" class="album-photo album-left-2" alt="Photo 2">
+  <img src="assets/images/photo3.png" class="album-photo album-right-1" alt="Photo 3" onerror="this.onerror=null;this.src='assets/images/photo3.jpg';">
+  <img src="assets/images/photo4.png" class="album-photo album-right-2" alt="Photo 4" onerror="this.onerror=null;this.src='assets/images/photo4.jpg';">
 
   <!-- Hint image -->
   <img src="assets/images/can-zoom.png" class="can-zoom">
@@ -385,7 +412,7 @@ p {
 			</div>
 		</div>
 		<!-- <div class="row message">
-			<div class="col-md-12"><p>Khushbu</p></div>
+			<div class="col-md-12"><p>Haya</p></div>
 		</div> -->
 		<div class="row cake-cover">
 			<div class="col-md-12 texr-center">
@@ -421,7 +448,7 @@ p {
 				<p>a piece of happiness to you</p>
 				<p>I made all this...</p>
 				<p>as a birthday present to you</p>
-				<p>I'm glad we met on zzz</p>
+				<p>I'm so glad and grateful to know you</p>
 				<p>thanks for the friendship we made</p>
 				<p>thanks for everything</p>
 				<p>I wish you all the best</p>
@@ -451,7 +478,7 @@ p {
 				<p>and make it the best memory..</p>
 				<p>lastly...</p>
 				<p>I'd like to wish you one more time</p>
-				<p>a very happy birthday babyy ❤️</p>
+				<p>a very happy birthday Haya ❤️</p>
 			</div>
 		</div>
 		<div class="navbar navbar-fixed-bottom">
@@ -463,8 +490,8 @@ p {
 					<button class="btn btn-primary" id="balloons_flying">Calm, i got you some baloons</button>
 					<button class="btn btn-primary" id="cake_fadein">Cake? of course!</button>
 					<button class="btn btn-primary" id="light_candle">Don't forget to Light the Candle</button>
-					<button class="btn btn-primary" id="wish_message">Happy Birthday</button>
-					<button class="btn btn-primary" id="story">A mesage for you</button>
+					<button class="btn btn-primary" id="wish_message">Happy Birthday Haya</button>
+					<button class="btn btn-primary" id="story">A message for you</button>
 					<!-- <button class="btn btn-primary" id="cake_cut">Lrt's Cut the Cake</button> -->
 				</div>
 			</div>
