@@ -272,28 +272,88 @@ $('document').ready(function(){
 
 });
 
-// Zoom (lightbox) feature
+// Zoom (lightbox) feature with 5-photo gallery
+var galleryPhotos = [
+    'assets/images/photo1.jpg',
+    'assets/images/photo2.jpg',
+    'assets/images/photo3.jpg',
+    'assets/images/photo4.jpg',
+    'assets/images/photo5.jpg'
+];
+var currentPhotoIndex = 0;
+
+function showGalleryPhoto(index) {
+    if (index < 0) index = galleryPhotos.length - 1;
+    if (index >= galleryPhotos.length) index = 0;
+    currentPhotoIndex = index;
+    $('#lightbox-img').attr('src', galleryPhotos[currentPhotoIndex]);
+    $('#lightbox-counter').text((currentPhotoIndex + 1) + ' / ' + galleryPhotos.length);
+}
+
 $(document).on('click', '.album-photo', function(e) {
     e.stopPropagation();
-    var src = this.currentSrc || this.src || $(this).attr('src');
-    if (!src) return;
-    $('#lightbox-img').attr('src', src);
+    var src = this.currentSrc || this.src || $(this).attr('src') || '';
+    var matchedIdx = -1;
+    for (var i = 0; i < galleryPhotos.length; i++) {
+        if (src.indexOf(galleryPhotos[i]) !== -1) {
+            matchedIdx = i;
+            break;
+        }
+    }
+    showGalleryPhoto(matchedIdx !== -1 ? matchedIdx : 0);
     $('#lightbox').css('display', 'flex').hide().fadeIn('fast');
+});
+
+$(document).on('click', '.lightbox-prev', function(e) {
+    e.stopPropagation();
+    showGalleryPhoto(currentPhotoIndex - 1);
+});
+
+$(document).on('click', '.lightbox-next', function(e) {
+    e.stopPropagation();
+    showGalleryPhoto(currentPhotoIndex + 1);
 });
 
 // Close when clicking outside image or on close button
 $(document).on('click', '#lightbox, .lightbox-close', function(e) {
-    if (e.target.id === 'lightbox-img') return;
+    if (e.target.id === 'lightbox-img' || $(e.target).closest('.lightbox-prev, .lightbox-next').length) return;
     $('#lightbox').fadeOut('fast', function() {
         $('#lightbox-img').attr('src', '');
     });
 });
 
-// ESC key closes lightbox
+// ESC key closes lightbox, Left/Right arrows navigate
 $(document).keyup(function(e) {
+    if (!$('#lightbox').is(':visible')) return;
     if (e.keyCode === 27) {
         $('#lightbox').fadeOut('fast', function() {
             $('#lightbox-img').attr('src', '');
         });
+    } else if (e.keyCode === 37) {
+        showGalleryPhoto(currentPhotoIndex - 1);
+    } else if (e.keyCode === 39) {
+        showGalleryPhoto(currentPhotoIndex + 1);
+    }
+});
+
+// Touch swipe support for mobile
+var touchStartX = 0;
+var touchEndX = 0;
+$(document).on('touchstart', '#lightbox', function(e) {
+    if (e.originalEvent && e.originalEvent.touches) {
+        touchStartX = e.originalEvent.touches[0].clientX;
+    }
+});
+$(document).on('touchend', '#lightbox', function(e) {
+    if (e.originalEvent && e.originalEvent.changedTouches) {
+        touchEndX = e.originalEvent.changedTouches[0].clientX;
+        var diffX = touchEndX - touchStartX;
+        if (Math.abs(diffX) > 40) {
+            if (diffX < 0) {
+                showGalleryPhoto(currentPhotoIndex + 1); // Swipe left = next
+            } else {
+                showGalleryPhoto(currentPhotoIndex - 1); // Swipe right = prev
+            }
+        }
     }
 });
