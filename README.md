@@ -1,52 +1,48 @@
-# 🔮 For Haya ✨ — 3D Interactive Celestial Keepsake
+# ⭐⭐ Give a star if you are helped by this repo 🙏⭐⭐
+# Happy Birthday
 
-A single-viewport, ultra-premium 3D WebGL interactive birthday gift experience crafted for **Haya** (born May 5, 2009).
+<img width="1920" height="881" alt="preview" src="https://github.com/user-attachments/assets/264fa78c-3edb-48ca-9f4a-2816e92e3d72" />
 
-> *"Some wishes refuse to be bound by a calendar. Yours is already written across the stars."*
 
-Built with **pure HTML5, CSS3, and JavaScript with Three.js (via CDN)**. No build tools, no bundlers, zero external image dependencies. Ready for 1-click deployment on **Vercel** or **Cloudflare Pages**.
+## A Happy Birthday animation design in CSS3, HTML5.
 
----
+URL: http://tiny.cc/brthday-web
 
-## 💜 Aesthetic & Creative Direction
+Technology Used: HTML5 CSS3 jQuery
 
-- **Single 3D Viewport**: Not a long scroll story — an intimate, immersive 3D digital keepsake she holds, drags, and explores with her hands.
-- **Strict Royal Purple & Amethyst Spectrum**: Completely zero gold or amber tones anywhere:
-  - Deep Amethyst & Royal Purple: `#6C3483`, `#7D3C98`
-  - Soft Orchid & Lavender: `#9B59B6`, `#B497D6`
-  - Pale Lilac & Starlight: `#E8D5F5`, `#F5EFFF`
-  - Midnight Obsidian Void: `#08040D`, `#0D0814`
-- **Living Particle Galaxy**: Thousands of glowing violet, lilac, and orchid motes drifting in 3D space with subtle mouse and gyro parallax reaction.
-- **Floating 3D Glass Keepsake Card**:
-  - Centerpiece 3D card gently floating with idle breathing animations and rim light.
-  - Multi-touch & mouse drag with momentum inertia to rotate 360° freely.
-  - **Front Face**: Dedicated to **"Haya Madam G 🎀👀"** in high-resolution engraved serif typography with celestial filigree.
-  - **Facets / Turns**: Unfolds poetic lines as she rotates through, revealing reflections on her quiet brilliance, unfolding horizons, and birthday blessings.
-  - **Back Face**: Timeless closing signature with dynamic current date.
-- **"Make a Wish" Particle Burst**: Tapping the glowing wish orb triggers a radial 3D stardust burst from the card and opens an illuminated blessing modal.
-- **Web Audio API Engine**: Built-in procedural harmonic synthesizer generating gentle ethereal ambient chimes (muted by default, autoplay-safe).
-- **Designer Signature**: Elegant subtle credit: *"Made With ❤️ By Haider — Turning code into feelings."*
+## UPDATE V.2
+- Reorganized Files, assets, css, js.
+- Added an album which contains all photos with your love one.
+- Added zoom to album photos.
+- Improved UI.
+- Changed font.
+- Fixed Bug.
 
----
+You can find the legacy codes on https://github.com/Shizu-ka/Birthday-Website/tree/legacy
 
-## 🚀 3-Step Deployment Guide
+## Future Plan
+- idk maybe make the website responsive or just block usage on mobile.
 
-### Option 1: Vercel (Recommended)
-1. Go to [vercel.com](https://vercel.com) and log in with your GitHub account.
-2. Select **"Import Project"** from your GitHub repository `haidermahh/for-haya`.
-3. Keep all build settings at default (Framework Preset: **Other**, Build Command: empty, Output Directory: `.`), and click **Deploy**.
-   - Your site will deploy instantly with continuous deployment on every git push!
+## FAQ
+### How can i change the picture?
+```
+Just change person.png or photos1-4 in assets/images in the directory to any picture you want. 
+Don't forget to resize your image to 490x435 px for person.png and 1920x1080 for album photos.jpg.
+```
+### How can i change the alphabet on the baloons?
+```
+Just go to index.html and change all the alphabets you want 
+```
+### How can i change the messages?
+```
+Just go to index.html and change all the messages you want 
+```
 
-### Option 2: Cloudflare Pages
-1. Go to [dash.cloudflare.com](https://dash.cloudflare.com) and navigate to **Workers & Pages**.
-2. Click **Create application** > **Pages** > **Connect to Git** (or select **Upload assets** for drag-and-drop).
-3. Connect your `for-haya` repository, leave the build settings empty, and click **Save and Deploy**.
+### LICENSE
+<a href="https://creativecommons.org/licenses/by-nc/4.0/">
+  <img width="700" height="189" alt="image" src="https://github.com/user-attachments/assets/079a8923-befa-4be8-be7a-7cbbc7500b5b" />
+</a>
+<a href="https://creativecommons.org/licenses/by-nc/4.0/">
+  <img width="700" height="497" alt="image" src="https://github.com/user-attachments/assets/126d922d-2255-4699-bc8a-355e2b3195d2" />
+</a>
 
----
-
-## 📱 Mobile Performance & Optimization
-
-- **Dynamic Particle Throttling**: Particle counts dynamically scale between desktop (2,500) and mobile (1,000) for smooth 60fps performance on mid-range devices.
-- **Single-Finger Touch Drag**: Intuitive touch controls with inertia damping and tilt clamping.
-- **Fixed Viewport Architecture**: `height: 100svh; overflow: hidden;` prevents mobile browser chrome bounce and accidental scrolling.
-- **Dual Event Handlers**: All buttons listen for both `click` and `touchend` events to guarantee zero dropped interactions on touchscreens.
