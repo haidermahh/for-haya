@@ -1,1126 +1,693 @@
 /**
- * FOR HAYA — 3D LUXURY KEEPSAKE EXPERIENCE
- * WebGL / Three.js Single-Viewport Engine
- * Features:
- *  - Fullscreen Living Particle Galaxy with Parallax
- *  - Floating 3D Glass Keepsake Card with High-Res Canvas Textures
- *  - Touch & Mouse 3D Inertia Drag Rotation
- *  - Unfolding Multi-Facet Message Engine
- *  - "Make a Wish" WebGL Particle Burst & Celestial Harmonic Sound
- *  - Web Audio API Synthetic Ambient Soundscape
- *  - Fully Responsive, Strict Amethyst/Orchid Palette
+ * FOR HAYA — CELESTIAL LUXURY KEEPSAKE
+ * script.js
+ *
+ * Architecture:
+ *  - Three.js renders ONLY the decorative glass card frame + particle background
+ *  - ALL text lives in HTML (zero canvas text = zero overflow bugs)
+ *  - Chapter navigation switches HTML content with smooth CSS transitions
+ *  - Web Audio API ambient synth + chime engine (zero external files)
+ *  - Full touch & mouse inertia drag on 3D frame
+ *  - Reduced-motion aware
  */
 
 (function () {
   'use strict';
 
-  /* ==========================================================================
-     1. COLOR PALETTE CONSTANTS (Strict Purple & Violet Spectrum)
-     ========================================================================== */
-  const COLORS = {
-    bgVoid: 0x08040d,
-    bgDeep: 0x0d0814,
-    purpleRoyal: 0x6c3483,
-    purpleAmethyst: 0x7d3c98,
-    purpleOrchid: 0x9b59b6,
-    purpleSoft: 0xb497d6,
-    purpleLilac: 0xe8d5f5,
-    purpleCrystal: 0xf5efff,
-    purpleDark: 0x371848,
-    glowGems: ['#E8D5F5', '#B497D6', '#9B59B6', '#7D3C98', '#6C3483']
+  /* ═══════════════════════════════════════════════════════════════════════
+     1. CONSTANTS
+  ═══════════════════════════════════════════════════════════════════════ */
+  const PALETTE = {
+    void:      0x07030d,
+    deep:      0x0e0719,
+    surface:   0x160827,
+    violet:    0x35105c,
+    purple:    0x6e2aa5,
+    lavender:  0xc8a7e8,
+    lilac:     0xe2d0f5,
+    warmWhite: 0xf8f3ff
   };
 
-  /* ==========================================================================
-     2. GLOBAL VARIABLES & STATE
-     ========================================================================== */
-  const container = document.getElementById('canvas-container');
-  const loadingScreen = document.getElementById('loading-screen');
-  const dragHint = document.getElementById('drag-hint');
-  const faceNavBtns = document.querySelectorAll('.face-nav-btn');
-  const makeWishBtn = document.getElementById('make-wish-btn');
-  const wishModal = document.getElementById('wish-modal');
-  const modalCloseBtn = document.getElementById('modal-close-btn');
-  const modalDismissBtn = document.getElementById('modal-dismiss-btn');
-  const modalBackdrop = document.getElementById('modal-backdrop');
-  const modalDateDisplay = document.getElementById('modal-date-display');
-  const soundToggleBtn = document.getElementById('sound-toggle-btn');
-  const soundBtnText = document.getElementById('sound-btn-text');
+  const isMobile     = () => window.innerWidth < 768;
+  const prefersLess  = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  let scene, camera, renderer;
-  let cardMesh, cardGroup;
-  let galaxyPoints, galaxyGeometry, galaxyMaterial;
-  let burstPointsGroup = [];
-  let ambientLight, keyPointLight, fillPointLight, rimPointLight;
+  /* ═══════════════════════════════════════════════════════════════════════
+     2. DOM REFERENCES
+  ═══════════════════════════════════════════════════════════════════════ */
+  const loadingVeil    = document.getElementById('loading-veil');
+  const bgCanvas       = document.getElementById('bg-canvas');
+  const cardCanvas     = document.getElementById('card-canvas');
+  const dragHint       = document.getElementById('drag-hint');
+  const chimeToggle    = document.getElementById('chime-toggle');
+  const tabs           = document.querySelectorAll('.chapter-tab');
+  const chapters       = document.querySelectorAll('.chapter');
+  const wishBtn        = document.getElementById('wish-btn');
+  const wishModal      = document.getElementById('wish-modal');
+  const wishBackdrop   = document.getElementById('wish-modal-backdrop');
+  const wishClose      = document.getElementById('wish-modal-close');
+  const wishDismiss    = document.getElementById('wish-modal-dismiss');
+  const journeyDate    = document.getElementById('journey-date');
 
-  // Interaction State
-  let isDragging = false;
-  let prevPointerX = 0;
-  let prevPointerY = 0;
-  let targetRotationY = 0;
-  let targetRotationX = 0;
-  let currentRotationY = 0;
-  let currentRotationX = 0;
-  let velocityY = 0;
-  let velocityX = 0;
-  let isNavSnapping = false;
-  let currentFaceIndex = 0;
-  let hasInteracted = false;
-  let clock = new THREE.Clock();
+  /* ═══════════════════════════════════════════════════════════════════════
+     3. DYNAMIC DATE
+  ═══════════════════════════════════════════════════════════════════════ */
+  if (journeyDate) {
+    const opts = { year: 'numeric', month: 'long', day: 'numeric' };
+    journeyDate.textContent =
+      new Date().toLocaleDateString('en-US', opts) + ' · Timeless Tribute';
+  }
 
-  // Mouse Parallax
-  let mouseX = 0;
-  let mouseY = 0;
-  let targetCameraX = 0;
-  let targetCameraY = 0;
-
-  // Facet Messages unfolded on rotation
-  const FACET_MESSAGES = [
-    {
-      index: 0,
-      angle: 0,
-      kicker: '✦ Face I • Genesis ✦',
-      title: 'Haya Madam G 🎀👀',
-      text: 'A radiant presence born May 5th, 2009 — carrying quiet grace and timeless warmth.'
-    },
-    {
-      index: 1,
-      angle: Math.PI / 2,
-      kicker: '✦ Face II • Grace ✦',
-      title: 'Quiet Brilliance',
-      text: 'You carry an effortless kindness that disarms the rush of the world and puts everyone at ease.'
-    },
-    {
-      index: 2,
-      angle: Math.PI,
-      kicker: '✦ Face III • The Journey ✦',
-      title: 'Unfolding Horizons',
-      text: 'Never rush who you are becoming. May every quiet hope you cherish find wings to soar.'
-    },
-    {
-      index: 3,
-      angle: (3 * Math.PI) / 2,
-      kicker: '✦ Face IV • The Blessing ✦',
-      title: 'Always Celebrated',
-      text: 'Happy Belated Birthday, Haya — some celebrations are too special for just one day.'
-    }
-  ];
-
-  /* ==========================================================================
-     3. WEB AUDIO API SYNTHETIC AMBIENT SOUND ENGINE
-     ========================================================================== */
-  class CelestialAudioEngine {
+  /* ═══════════════════════════════════════════════════════════════════════
+     4. WEB AUDIO — SYNTHETIC AMBIENT ENGINE
+  ═══════════════════════════════════════════════════════════════════════ */
+  class AmbientEngine {
     constructor() {
-      this.ctx = null;
-      this.isPlaying = false;
-      this.ambientGain = null;
-      this.timer = null;
+      this.ctx         = null;
+      this.masterGain  = null;
+      this.droneOscs   = [];
+      this.chimeTimer  = null;
+      this.active      = false;
     }
 
-    init() {
+    _boot() {
       if (this.ctx) return;
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      this.ctx = new AudioCtx();
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      this.ctx = new AC();
     }
 
-    startAmbient() {
-      this.init();
+    _resume() {
+      if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+    }
+
+    start() {
+      this._boot();
       if (!this.ctx) return;
-      if (this.ctx.state === 'suspended') {
-        this.ctx.resume();
-      }
+      this._resume();
+      this.active = true;
 
-      this.isPlaying = true;
+      // Master gain — fade in
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+      this.masterGain.gain.exponentialRampToValueAtTime(0.18, this.ctx.currentTime + 3);
+      this.masterGain.connect(this.ctx.destination);
 
-      // Master ambient gain
-      this.ambientGain = this.ctx.createGain();
-      this.ambientGain.gain.setValueAtTime(0.01, this.ctx.currentTime);
-      this.ambientGain.gain.exponentialRampToValueAtTime(0.25, this.ctx.currentTime + 3);
-      this.ambientGain.connect(this.ctx.destination);
-
-      // Warm purple drone pad (Amethyst Eb Minor / Gb major harmony)
-      const freqs = [155.56, 185.0, 233.08, 277.18, 311.13]; // Eb3, Gb3, Bb3, Db4, Eb4
-      freqs.forEach((freq, idx) => {
-        const osc = this.ctx.createOscillator();
+      // Eb minor drone — soft triadic harmonic pad
+      const drones = [155.56, 185.00, 233.08, 311.13, 370.00];
+      drones.forEach((freq, i) => {
+        const osc  = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        const filter = this.ctx.createBiquadFilter();
+        const lp   = this.ctx.createBiquadFilter();
 
-        osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        osc.type = i % 2 === 0 ? 'sine' : 'triangle';
+        osc.frequency.value = freq;
 
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(450 + idx * 80, this.ctx.currentTime);
+        lp.type = 'lowpass';
+        lp.frequency.value = 600 + i * 80;
 
-        gain.gain.setValueAtTime(0.035, this.ctx.currentTime);
+        gain.gain.value = 0.03;
 
-        osc.connect(filter);
-        filter.connect(gain);
-        gain.connect(this.ambientGain);
-
+        osc.connect(lp); lp.connect(gain); gain.connect(this.masterGain);
         osc.start();
+        this.droneOscs.push(osc);
       });
 
-      // Scheduled random celestial bell tones
-      this.scheduleNextChime();
+      this._scheduleChime();
     }
 
-    scheduleNextChime() {
-      if (!this.isPlaying) return;
-      const delay = 3500 + Math.random() * 4000;
-      this.timer = setTimeout(() => {
-        if (this.isPlaying) {
-          this.playBellTone();
-          this.scheduleNextChime();
-        }
+    stop() {
+      this.active = false;
+      if (this.chimeTimer) clearTimeout(this.chimeTimer);
+      if (this.masterGain && this.ctx) {
+        this.masterGain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 1.2);
+      }
+      setTimeout(() => {
+        this.droneOscs.forEach(o => { try { o.stop(); } catch (_) {} });
+        this.droneOscs = [];
+      }, 1500);
+    }
+
+    _scheduleChime() {
+      if (!this.active) return;
+      const delay = 3000 + Math.random() * 5000;
+      this.chimeTimer = setTimeout(() => {
+        if (this.active) { this._chime(); this._scheduleChime(); }
       }, delay);
     }
 
-    playBellTone(freq) {
+    _chime(freq) {
       if (!this.ctx) return;
-      const chimeFreqs = [622.25, 739.99, 830.61, 932.33, 1108.73, 1244.51];
-      const selected = freq || chimeFreqs[Math.floor(Math.random() * chimeFreqs.length)];
+      const freqs = [622.25, 739.99, 880.00, 1046.50, 1174.66];
+      const f = freq || freqs[Math.floor(Math.random() * freqs.length)];
 
-      const osc = this.ctx.createOscillator();
+      const osc  = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      const filter = this.ctx.createBiquadFilter();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(selected, this.ctx.currentTime);
-
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(selected, this.ctx.currentTime);
-      filter.Q.setValueAtTime(4.0, this.ctx.currentTime);
-
+      osc.frequency.value = f;
       gain.gain.setValueAtTime(0.001, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.08, this.ctx.currentTime + 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 2.5);
+      gain.gain.exponentialRampToValueAtTime(0.055, this.ctx.currentTime + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 2.2);
 
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(this.ctx.destination);
-
-      osc.start();
-      osc.stop(this.ctx.currentTime + 2.6);
+      osc.connect(gain); gain.connect(this.ctx.destination);
+      osc.start(); osc.stop(this.ctx.currentTime + 2.4);
     }
 
-    playWishCelebration() {
-      this.init();
-      if (!this.ctx) return;
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-
-      // Sweeping celestial harp arpeggio
-      const notes = [311.13, 370.0, 466.16, 622.25, 739.99, 932.33, 1244.51];
-      notes.forEach((pitch, i) => {
-        setTimeout(() => {
-          this.playBellTone(pitch);
-        }, i * 90);
-      });
-    }
-
-    stopAmbient() {
-      this.isPlaying = false;
-      if (this.timer) clearTimeout(this.timer);
-      if (this.ambientGain && this.ctx) {
-        this.ambientGain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 1);
-      }
+    celebrateWish() {
+      this._boot(); this._resume();
+      const arp = [311.13, 370.00, 466.16, 622.25, 739.99, 932.33, 1244.51];
+      arp.forEach((f, i) => setTimeout(() => this._chime(f), i * 85));
     }
   }
 
-  const audio = new CelestialAudioEngine();
+  const synth = new AmbientEngine();
 
-  /* ==========================================================================
-     4. HIGH-RESOLUTION DYNAMIC 2D CANVAS TEXTURE GENERATOR
-     ========================================================================== */
-
-  /**
-   * Word-wraps text inside a 2D canvas.
-   * @param {CanvasRenderingContext2D} ctx
-   * @param {string} text
-   * @param {number} x      Center X (textAlign: 'center')
-   * @param {number} y      Starting baseline Y
-   * @param {number} maxWidth
-   * @param {number} lineHeight
-   * @returns {number}  Y after last line
-   */
-  function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-    const words = text.split(' ');
-    let line = '';
-    let cur = y;
-    for (let n = 0; n < words.length; n++) {
-      const test = line + words[n] + ' ';
-      if (ctx.measureText(test).width > maxWidth && n > 0) {
-        ctx.fillText(line.trim(), x, cur);
-        line = words[n] + ' ';
-        cur += lineHeight;
+  /* ═══════════════════════════════════════════════════════════════════════
+     5. AMBIENT CHIME TOGGLE
+  ═══════════════════════════════════════════════════════════════════════ */
+  if (chimeToggle) {
+    chimeToggle.addEventListener('click', () => {
+      const active = chimeToggle.getAttribute('aria-pressed') === 'true';
+      if (active) {
+        synth.stop();
+        chimeToggle.setAttribute('aria-pressed', 'false');
+        chimeToggle.classList.remove('is-active');
       } else {
-        line = test;
+        synth.start();
+        chimeToggle.setAttribute('aria-pressed', 'true');
+        chimeToggle.classList.add('is-active');
       }
-    }
-    if (line.trim()) {
-      ctx.fillText(line.trim(), x, cur);
-      cur += lineHeight;
-    }
-    return cur;
-  }
-
-  function createFrontTexture() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 1440;
-    const ctx = canvas.getContext('2d');
-
-    // Safe rails: 90px padding from each edge → 844px usable text width
-    const PAD   = 90;
-    const SAFE  = 1024 - PAD * 2;   // 844
-    const CX    = 512;
-
-    // 1. Background gradient
-    const bgGrad = ctx.createLinearGradient(0, 0, 1024, 1440);
-    bgGrad.addColorStop(0,    '#0c0614');
-    bgGrad.addColorStop(0.35, '#190a2a');
-    bgGrad.addColorStop(0.7,  '#130722');
-    bgGrad.addColorStop(1,    '#09040e');
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, 1024, 1440);
-
-    // 2. Ambient glow
-    const glowGrad = ctx.createRadialGradient(CX, 540, 50, CX, 540, 500);
-    glowGrad.addColorStop(0,   'rgba(155,89,182,0.28)');
-    glowGrad.addColorStop(0.5, 'rgba(108,52,131,0.12)');
-    glowGrad.addColorStop(1,   'rgba(0,0,0,0)');
-    ctx.fillStyle = glowGrad;
-    ctx.fillRect(0, 0, 1024, 1440);
-
-    // 3. Double hairline border
-    ctx.strokeStyle = 'rgba(180,151,214,0.45)'; ctx.lineWidth = 2.5;
-    ctx.strokeRect(40, 40, 944, 1360);
-    ctx.strokeStyle = 'rgba(180,151,214,0.22)'; ctx.lineWidth = 1;
-    ctx.strokeRect(54, 54, 916, 1332);
-
-    // Corner gems
-    ctx.fillStyle = '#E8D5F5';
-    [[40,40],[984,40],[40,1400],[984,1400]].forEach(([x,y]) => {
-      ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill();
     });
-
-    ctx.textAlign = 'center';
-
-    // 4. Top kicker
-    ctx.font = '300 22px "Jost", sans-serif';
-    ctx.fillStyle = '#B497D6';
-    ctx.fillText('✦   A TIMELESS KEEPSAKE   ✦', CX, 140);
-
-    // Celestial medallion rings
-    ctx.strokeStyle = 'rgba(232,213,245,0.6)'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.arc(CX, 290, 80, 0, Math.PI * 2); ctx.stroke();
-    ctx.strokeStyle = 'rgba(155,89,182,0.4)'; ctx.setLineDash([4,6]);
-    ctx.beginPath(); ctx.arc(CX, 290, 95, 0, Math.PI * 2); ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Monogram H
-    ctx.font = 'italic 500 86px "Cormorant Garamond", Georgia, serif';
-    ctx.fillStyle = '#F5EFFF';
-    ctx.shadowColor = 'rgba(232,213,245,0.7)'; ctx.shadowBlur = 25;
-    ctx.fillText('H', CX, 320);
-    ctx.shadowBlur = 0;
-
-    // 5. Dedication kicker
-    ctx.font = '300 26px "Jost", sans-serif';
-    ctx.fillStyle = '#B497D6';
-    ctx.fillText('D E D I C A T E D   T O', CX, 510);
-
-    // ── Her name ONLY — no "Madam G", no colorful emojis ──
-    ctx.font = 'italic 500 96px "Playfair Display", Georgia, serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.shadowColor = 'rgba(180,151,214,0.9)'; ctx.shadowBlur = 40;
-    ctx.fillText('Haya', CX, 622);
-    ctx.shadowBlur = 0;
-
-    // Subtle sparkle row beneath name (purple-lilac only)
-    ctx.font = '26px sans-serif';
-    ctx.fillStyle = '#B497D6';
-    ctx.fillText('✦   ✧   ✦', CX, 678);
-
-    // Sub-heading — wrapped
-    ctx.font = '300 28px "Jost", sans-serif';
-    ctx.fillStyle = '#B497D6';
-    wrapText(ctx, 'May 5th, 2009  •  A Radiant Soul', CX, 740, SAFE, 42);
-
-    // Divider
-    ctx.strokeStyle = 'rgba(180,151,214,0.45)'; ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(PAD + 80, 812); ctx.lineTo(CX - 60, 812);
-    ctx.moveTo(CX + 60, 812); ctx.lineTo(1024 - PAD - 80, 812);
-    ctx.stroke();
-    ctx.font = '24px sans-serif'; ctx.fillStyle = '#E8D5F5';
-    ctx.fillText('✧ ✦ ✧', CX, 820);
-
-    // Poetic inscription — WRAPPED within safe rails
-    ctx.font = 'italic 400 33px "Cormorant Garamond", Georgia, serif';
-    ctx.fillStyle = '#E8D5F5';
-    wrapText(
-      ctx,
-      '\u201cA soul that quietly disarms the world with warmth, bringing light wherever you choose to step.\u201d',
-      CX, 900, SAFE, 54
-    );
-
-    // Bottom hint — wrapped
-    ctx.font = '300 22px "Jost", sans-serif';
-    ctx.fillStyle = 'rgba(180,151,214,0.65)';
-    wrapText(ctx, '✦  DRAG TO ROTATE & UNVEIL HER BLESSINGS  ✦', CX, 1295, SAFE, 36);
-
-    return new THREE.CanvasTexture(canvas);
   }
 
-  function createBackTexture() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 1440;
-    const ctx = canvas.getContext('2d');
-
-    const PAD  = 90;
-    const SAFE = 1024 - PAD * 2;  // 844px usable
-    const CX   = 512;
-
-    // 1. Deep obsidian purple background
-    const bgGrad = ctx.createLinearGradient(0, 0, 1024, 1440);
-    bgGrad.addColorStop(0,   '#09040e');
-    bgGrad.addColorStop(0.4, '#150824');
-    bgGrad.addColorStop(0.8, '#1e0d33');
-    bgGrad.addColorStop(1,   '#09040e');
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, 1024, 1440);
-
-    // 2. Ambient glow
-    const glowGrad = ctx.createRadialGradient(CX, 600, 50, CX, 600, 500);
-    glowGrad.addColorStop(0,   'rgba(125,60,152,0.32)');
-    glowGrad.addColorStop(0.6, 'rgba(108,52,131,0.1)');
-    glowGrad.addColorStop(1,   'rgba(0,0,0,0)');
-    ctx.fillStyle = glowGrad;
-    ctx.fillRect(0, 0, 1024, 1440);
-
-    // 3. Double borders
-    ctx.strokeStyle = 'rgba(180,151,214,0.45)'; ctx.lineWidth = 2.5;
-    ctx.strokeRect(40, 40, 944, 1360);
-    ctx.strokeStyle = 'rgba(180,151,214,0.2)';  ctx.lineWidth = 1;
-    ctx.strokeRect(54, 54, 916, 1332);
-
-    // Corner gems
-    ctx.fillStyle = '#E8D5F5';
-    [[40,40],[984,40],[40,1400],[984,1400]].forEach(([x,y]) => {
-      ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill();
-    });
-
-    ctx.textAlign = 'center';
-
-    // 4. Header kicker — wrapped for safety
-    ctx.font = '300 22px "Jost", sans-serif';
-    ctx.fillStyle = '#B497D6';
-    wrapText(ctx, '✦   THE CELESTIAL WISH   ✦', CX, 140, SAFE, 36);
-
-    // Celestial emblem — pure lilac sparkles, no colorful emojis
-    ctx.font = '52px sans-serif';
-    ctx.fillStyle = '#E8D5F5';
-    ctx.shadowColor = 'rgba(180,151,214,0.75)'; ctx.shadowBlur = 22;
-    ctx.fillText('✦  ✧  ✦', CX, 260);
-    ctx.shadowBlur = 0;
-
-    // Headline — wrapped
-    ctx.font = 'italic 500 66px "Playfair Display", Georgia, serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.shadowColor = 'rgba(232,213,245,0.5)'; ctx.shadowBlur = 20;
-    wrapText(ctx, 'Timeless Radiance', CX, 380, SAFE, 80);
-    ctx.shadowBlur = 0;
-
-    // Body paragraph — WRAPPED
-    ctx.font = '300 30px "Cormorant Garamond", Georgia, serif';
-    ctx.fillStyle = '#E8D5F5';
-    let afterBody = wrapText(
-      ctx,
-      'Some wishes refuse to be contained by a single day on the calendar. Though May 5th has quietly passed, the desire to celebrate your presence remains as radiant, steadfast, and bright as ever.',
-      CX, 510, SAFE, 46
-    );
-
-    // Divider
-    ctx.strokeStyle = 'rgba(180,151,214,0.4)'; ctx.lineWidth = 1;
-    const divY = afterBody + 20;
-    ctx.beginPath();
-    ctx.moveTo(PAD + 60, divY); ctx.lineTo(CX - 40, divY);
-    ctx.moveTo(CX + 40, divY); ctx.lineTo(1024 - PAD - 60, divY);
-    ctx.stroke();
-    ctx.font = '22px sans-serif'; ctx.fillStyle = '#B497D6';
-    ctx.fillText('✧ ✦ ✧', CX, divY + 8);
-
-    // Highlight quote — WRAPPED
-    ctx.font = 'italic 500 36px "Cormorant Garamond", Georgia, serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.shadowColor = 'rgba(232,213,245,0.6)'; ctx.shadowBlur = 18;
-    let afterQuote = wrapText(
-      ctx,
-      '\u201cMay this year be gentle with your heart, generous with your dreams, and filled with magic you never saw coming.\u201d',
-      CX, divY + 60, SAFE, 54
-    );
-    ctx.shadowBlur = 0;
-
-    // Second verse — WRAPPED
-    ctx.font = '300 30px "Cormorant Garamond", Georgia, serif';
-    ctx.fillStyle = '#E8D5F5';
-    let afterVerse = wrapText(
-      ctx,
-      'Never hurry who you are becoming. May each chapter grant you unshakeable peace, effortless joy, and pride in everything you are.',
-      CX, afterQuote + 30, SAFE, 46
-    );
-
-    // Closing signature — wrapped
-    ctx.font = 'italic 500 44px "Playfair Display", Georgia, serif';
-    ctx.fillStyle = '#FFFFFF';
-    const sigY = Math.min(afterVerse + 60, 1155);
-    wrapText(ctx, 'With warmth & highest admiration,', CX, sigY, SAFE, 58);
-
-    // Dynamic date — wrapped
-    const today = new Date();
-    const dateFormatted = today.toLocaleDateString('en-US', {
-      year: 'numeric', month: 'long', day: 'numeric'
-    });
-    ctx.font = '300 22px "Jost", sans-serif';
-    ctx.fillStyle = '#B497D6';
-    wrapText(ctx, `Recorded on ${dateFormatted}  •  Timeless Tribute`, CX, sigY + 70, SAFE, 34);
-
-    // Footer gem row — pure lilac, no emoji
-    ctx.font = '26px sans-serif'; ctx.fillStyle = '#E8D5F5';
-    ctx.fillText('✦   ✧   ✦', CX, 1315);
-
-    return new THREE.CanvasTexture(canvas);
-  }
-
-  function createEdgeTexture() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 128;
-    canvas.height = 128;
-    const ctx = canvas.getContext('2d');
-
-    const grad = ctx.createLinearGradient(0, 0, 128, 128);
-    grad.addColorStop(0, '#2b1040');
-    grad.addColorStop(0.5, '#7d3c98');
-    grad.addColorStop(1, '#1b082a');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 128, 128);
-
-    ctx.strokeStyle = 'rgba(232, 213, 245, 0.4)';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(0, 0, 128, 128);
-
-    return new THREE.CanvasTexture(canvas);
-  }
-
-  function createGlowPointTexture() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 64;
-    canvas.height = 64;
-    const ctx = canvas.getContext('2d');
-
-    const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-    grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    grad.addColorStop(0.25, 'rgba(232, 213, 245, 0.9)');
-    grad.addColorStop(0.55, 'rgba(155, 89, 182, 0.45)');
-    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 64, 64);
-
-    return new THREE.CanvasTexture(canvas);
-  }
-
-  /* ==========================================================================
-     5. THREE.JS SCENE SETUP
-     ========================================================================== */
-  function initThreeScene() {
-    // 1. Scene
-    scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(COLORS.bgVoid, 0.024);
-
-    // 2. Camera
-    const aspect = window.innerWidth / window.innerHeight;
-    camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
-    updateCameraDistance();
-
-    // 3. Renderer
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.25;
-    container.appendChild(renderer.domElement);
-
-    // 4. Lights (Strict Purple Spectrum)
-    ambientLight = new THREE.AmbientLight(0x4a256d, 1.4);
-    scene.add(ambientLight);
-
-    keyPointLight = new THREE.PointLight(COLORS.purpleSoft, 2.8, 35);
-    keyPointLight.position.set(5, 7, 8);
-    scene.add(keyPointLight);
-
-    fillPointLight = new THREE.PointLight(COLORS.purpleRoyal, 2.2, 35);
-    fillPointLight.position.set(-6, -4, 6);
-    scene.add(fillPointLight);
-
-    rimPointLight = new THREE.PointLight(COLORS.purpleLilac, 3.2, 25);
-    rimPointLight.position.set(0, 5, -8);
-    scene.add(rimPointLight);
-
-    // 5. Living Particle Galaxy
-    createLivingGalaxy();
-
-    // 6. Floating Keepsake Card Centerpiece
-    createFloatingKeepsakeCard();
-
-    // Fade out loading screen smoothly once scene is ready
-    setTimeout(() => {
-      if (loadingScreen) {
-        loadingScreen.classList.add('is-loaded');
+  /* ═══════════════════════════════════════════════════════════════════════
+     6. CHAPTER NAVIGATION
+  ═══════════════════════════════════════════════════════════════════════ */
+  function switchChapter(newId) {
+    chapters.forEach(ch => {
+      const isTarget = ch.getAttribute('data-chapter') === newId;
+      if (!isTarget) {
+        ch.classList.add('is-hidden');
+        ch.classList.remove('is-entering');
+      } else {
+        ch.classList.remove('is-hidden');
+        void ch.offsetWidth; // reflow to restart animation
+        ch.classList.add('is-entering');
       }
-    }, 600);
+    });
+
+    tabs.forEach(tab => {
+      const isTarget = tab.getAttribute('data-chapter') === newId;
+      tab.classList.toggle('is-active', isTarget);
+      tab.setAttribute('aria-selected', String(isTarget));
+    });
+
+    // Chime on tab switch
+    synth._boot();
+    const chimeMap = { genesis: 622.25, grace: 739.99, journey: 880, blessing: 1046.5 };
+    if (synth.ctx) synth._chime(chimeMap[newId]);
   }
 
-  function updateCameraDistance() {
-    const isMobile = window.innerWidth < 768;
-    const isNarrow = window.innerWidth < 480;
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      switchChapter(tab.getAttribute('data-chapter'));
+    });
+  });
 
-    if (isNarrow) {
-      camera.position.set(0, 0.2, 10.5);
-    } else if (isMobile) {
-      camera.position.set(0, 0.2, 9.2);
-    } else {
-      camera.position.set(0, 0.2, 7.8);
-    }
+  /* ═══════════════════════════════════════════════════════════════════════
+     7. WISH MODAL
+  ═══════════════════════════════════════════════════════════════════════ */
+  function openWish() {
+    wishModal.classList.add('is-open');
+    wishModal.setAttribute('aria-hidden', 'false');
+    synth.celebrateWish();
+    triggerWishParticles();
   }
 
-  /* ==========================================================================
-     6. LIVING PARTICLE GALAXY
-     ========================================================================== */
-  function createLivingGalaxy() {
-    const isMobile = window.innerWidth < 768;
-    const count = isMobile ? 1000 : 2500; // Performance optimization for mid-range phones
+  function closeWish() {
+    wishModal.classList.remove('is-open');
+    wishModal.setAttribute('aria-hidden', 'true');
+  }
 
-    galaxyGeometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
-    const scales = new Float32Array(count);
+  [wishBtn].forEach(el => {
+    if (!el) return;
+    el.addEventListener('click', openWish);
+    el.addEventListener('touchend', e => { e.preventDefault(); openWish(); }, { passive: false });
+  });
 
-    const palette = [
-      new THREE.Color(COLORS.purpleLilac),
-      new THREE.Color(COLORS.purpleSoft),
-      new THREE.Color(COLORS.purpleOrchid),
-      new THREE.Color(COLORS.purpleAmethyst),
-      new THREE.Color(0xd2b4de)
+  [wishClose, wishDismiss, wishBackdrop].forEach(el => {
+    if (!el) return;
+    el.addEventListener('click', closeWish);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeWish();
+  });
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     8. THREE.JS — BACKGROUND PARTICLE FIELD
+  ═══════════════════════════════════════════════════════════════════════ */
+  let bgScene, bgCamera, bgRenderer, starsPoints, starsMat;
+  let wishBursts = [];
+
+  function initBackground() {
+    bgScene  = new THREE.Scene();
+    bgCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+    bgCamera.position.set(0, 0, 40);
+
+    bgRenderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: 'high-performance' });
+    bgRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    bgRenderer.setSize(window.innerWidth, window.innerHeight);
+    bgRenderer.setClearColor(0x07030d, 1);
+    bgCanvas.appendChild(bgRenderer.domElement);
+
+    // Stars
+    const count = isMobile() ? 600 : 1400;
+    const geo   = new THREE.BufferGeometry();
+    const pos   = new Float32Array(count * 3);
+    const col   = new Float32Array(count * 3);
+
+    const pal = [
+      new THREE.Color(0xf8f3ff),
+      new THREE.Color(0xe2d0f5),
+      new THREE.Color(0xc8a7e8),
+      new THREE.Color(0x9b72cc),
+      new THREE.Color(0xb9a8c8)
     ];
 
     for (let i = 0; i < count; i++) {
-      // Cylindrical/spherical soft galaxy dispersion
-      const radius = 6 + Math.pow(Math.random(), 1.5) * 35;
-      const theta = Math.random() * Math.PI * 2;
-      const y = (Math.random() - 0.5) * 28;
+      const r    = 18 + Math.random() * 55;
+      const th   = Math.random() * Math.PI * 2;
+      const phi  = Math.acos(2 * Math.random() - 1);
 
-      positions[i * 3] = radius * Math.cos(theta);
-      positions[i * 3 + 1] = y;
-      positions[i * 3 + 2] = radius * Math.sin(theta);
+      pos[i*3]   = r * Math.sin(phi) * Math.cos(th);
+      pos[i*3+1] = r * Math.sin(phi) * Math.sin(th);
+      pos[i*3+2] = r * Math.cos(phi);
 
-      const color = palette[Math.floor(Math.random() * palette.length)];
-      colors[i * 3] = color.r;
-      colors[i * 3 + 1] = color.g;
-      colors[i * 3 + 2] = color.b;
-
-      scales[i] = 0.5 + Math.random() * 1.5;
+      const c = pal[Math.floor(Math.random() * pal.length)];
+      col[i*3]   = c.r;
+      col[i*3+1] = c.g;
+      col[i*3+2] = c.b;
     }
 
-    galaxyGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    galaxyGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color',    new THREE.BufferAttribute(col, 3));
 
-    const glowTex = createGlowPointTexture();
-    galaxyMaterial = new THREE.PointsMaterial({
-      size: isMobile ? 0.35 : 0.42,
-      map: glowTex,
-      transparent: true,
-      opacity: 0.82,
+    starsMat = new THREE.PointsMaterial({
+      size:         isMobile() ? 0.28 : 0.34,
+      map:          makeGlowSprite(),
+      transparent:  true,
+      opacity:      0.88,
       vertexColors: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
+      blending:     THREE.AdditiveBlending,
+      depthWrite:   false
     });
 
-    galaxyPoints = new THREE.Points(galaxyGeometry, galaxyMaterial);
-    scene.add(galaxyPoints);
+    starsPoints = new THREE.Points(geo, starsMat);
+    bgScene.add(starsPoints);
+
+    // Subtle nebula glow
+    const ambL = new THREE.AmbientLight(0x35105c, 0.6);
+    bgScene.add(ambL);
   }
 
-  /* ==========================================================================
-     7. FLOATING 3D GLASS KEEPSAKE CARD
-     ========================================================================== */
-  function createFloatingKeepsakeCard() {
+  function makeGlowSprite() {
+    const size = 64;
+    const cv   = document.createElement('canvas');
+    cv.width   = size; cv.height = size;
+    const ctx  = cv.getContext('2d');
+    const g    = ctx.createRadialGradient(32,32,0, 32,32,32);
+    g.addColorStop(0,    'rgba(255,255,255,1)');
+    g.addColorStop(0.22, 'rgba(226,208,245,0.85)');
+    g.addColorStop(0.5,  'rgba(155,114,204,0.35)');
+    g.addColorStop(1,    'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,size,size);
+    return new THREE.CanvasTexture(cv);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     9. THREE.JS — DECORATIVE 3D GLASS CARD FRAME
+     (Frame only — NO text drawn here; text lives in HTML)
+  ═══════════════════════════════════════════════════════════════════════ */
+  let cardScene, cardCamera, cardRenderer, cardGroup, cardClock;
+  let rotTarget = { y: 0, x: 0 };
+  let rotCurrent = { y: 0, x: 0 };
+  let rotVel     = { y: 0, x: 0 };
+  let dragging   = false;
+  let prevPtr    = { x: 0, y: 0 };
+  let hasInteracted = false;
+  let mouseNorm  = { x: 0, y: 0 };
+
+  function initCard() {
+    const wrap  = cardCanvas;
+    const W     = wrap.offsetWidth;
+    const H     = wrap.offsetHeight;
+
+    cardScene  = new THREE.Scene();
+    cardClock  = new THREE.Clock();
+
+    cardCamera = new THREE.PerspectiveCamera(38, W / H, 0.1, 60);
+    cardCamera.position.set(0, 0, 8.5);
+
+    cardRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    cardRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    cardRenderer.setSize(W, H);
+    cardRenderer.setClearColor(0x000000, 0);
+    wrap.appendChild(cardRenderer.domElement);
+
+    // Card group — glass frame
     cardGroup = new THREE.Group();
-    scene.add(cardGroup);
+    cardScene.add(cardGroup);
 
-    // Dimensions: luxury card proportions
-    const width = 3.3;
-    const height = 4.65;
-    const depth = 0.28;
-
-    const geometry = new THREE.BoxGeometry(width, height, depth, 4, 4, 2);
-
-    const frontTexture = createFrontTexture();
-    const backTexture = createBackTexture();
-    const edgeTexture = createEdgeTexture();
-
-    // Three.js Box Materials: [right, left, top, bottom, front, back]
-    const edgeMaterial = new THREE.MeshStandardMaterial({
-      color: COLORS.purpleOrchid,
-      roughness: 0.22,
-      metalness: 0.45,
-      emissive: COLORS.purpleDark,
-      emissiveIntensity: 0.6,
-      map: edgeTexture
-    });
-
-    const frontMaterial = new THREE.MeshStandardMaterial({
-      map: frontTexture,
-      roughness: 0.2,
-      metalness: 0.25,
-      emissive: COLORS.purpleDark,
-      emissiveIntensity: 0.25
-    });
-
-    const backMaterial = new THREE.MeshStandardMaterial({
-      map: backTexture,
-      roughness: 0.2,
-      metalness: 0.25,
-      emissive: COLORS.purpleDark,
-      emissiveIntensity: 0.25
-    });
-
-    const materials = [
-      edgeMaterial, // +X right
-      edgeMaterial, // -X left
-      edgeMaterial, // +Y top
-      edgeMaterial, // -Y bottom
-      frontMaterial, // +Z front (Haya Madam G)
-      backMaterial // -Z back (The Celestial Wish)
-    ];
-
-    cardMesh = new THREE.Mesh(geometry, materials);
-    cardGroup.add(cardMesh);
-
-    // Add a delicate outer frosted glass halo rim
-    const haloGeo = new THREE.BoxGeometry(width + 0.12, height + 0.12, depth + 0.04);
-    const haloMat = new THREE.MeshBasicMaterial({
-      color: COLORS.purpleLilac,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.18
-    });
-    const haloMesh = new THREE.Mesh(haloGeo, haloMat);
-    cardGroup.add(haloMesh);
+    buildGlassCard();
+    setupCardLights();
+    bindCardPointer();
   }
 
-  /* ==========================================================================
-     8. PARTICLE BURST FOR "MAKE A WISH"
-     ========================================================================== */
-  function triggerParticleBurst() {
-    const burstCount = window.innerWidth < 768 ? 200 : 400;
-    const geo = new THREE.BufferGeometry();
-    const positions = new Float32Array(burstCount * 3);
-    const velocities = [];
-    const colors = new Float32Array(burstCount * 3);
+  function buildGlassCard() {
+    // Outer glass border frame — four thin edge panels
+    const W = 3.0, H = 4.2, D = 0.12, T = 0.06;
 
-    const palette = [
-      new THREE.Color(COLORS.purpleLilac),
-      new THREE.Color(COLORS.purpleSoft),
-      new THREE.Color(COLORS.purpleOrchid),
-      new THREE.Color(0xffffff)
-    ];
-
-    for (let i = 0; i < burstCount; i++) {
-      // Start at card center
-      positions[i * 3] = (Math.random() - 0.5) * 1.5;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 2;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 0.5;
-
-      // Spherical explosion velocities
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(Math.random() * 2 - 1);
-      const speed = 4 + Math.random() * 8;
-
-      velocities.push({
-        x: speed * Math.sin(phi) * Math.cos(theta),
-        y: speed * Math.sin(phi) * Math.sin(theta),
-        z: speed * Math.cos(phi),
-        drag: 0.94 + Math.random() * 0.04
-      });
-
-      const col = palette[Math.floor(Math.random() * palette.length)];
-      colors[i * 3] = col.r;
-      colors[i * 3 + 1] = col.g;
-      colors[i * 3 + 2] = col.b;
-    }
-
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-    const mat = new THREE.PointsMaterial({
-      size: 0.55,
-      map: createGlowPointTexture(),
-      transparent: true,
-      opacity: 1.0,
-      vertexColors: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
+    const edgeMat = new THREE.MeshStandardMaterial({
+      color:             PALETTE.violet,
+      roughness:         0.12,
+      metalness:         0.65,
+      emissive:          new THREE.Color(PALETTE.purple),
+      emissiveIntensity: 0.25,
+      transparent:       true,
+      opacity:           0.85
     });
 
-    const burstPoints = new THREE.Points(geo, mat);
-    scene.add(burstPoints);
+    // Top edge
+    addEdge(0,  H/2,  0, W,   T, D, edgeMat);
+    // Bottom edge
+    addEdge(0, -H/2,  0, W,   T, D, edgeMat);
+    // Left edge
+    addEdge(-W/2, 0,  0, T, H+T, D, edgeMat);
+    // Right edge
+    addEdge( W/2, 0,  0, T, H+T, D, edgeMat);
 
-    burstPointsGroup.push({
-      mesh: burstPoints,
-      velocities: velocities,
-      life: 1.0,
-      decay: 0.016
+    // Inner glass fill — frosted, very transparent
+    const glassMat = new THREE.MeshStandardMaterial({
+      color:            PALETTE.surface,
+      roughness:        0.05,
+      metalness:        0.08,
+      transparent:      true,
+      opacity:          0.18,
+      side:             THREE.FrontSide
     });
 
-    // Surge light intensity
-    if (keyPointLight) {
-      keyPointLight.intensity = 6.0;
-    }
+    const glassGeo = new THREE.BoxGeometry(W - T, H - T, 0.02);
+    const glass    = new THREE.Mesh(glassGeo, glassMat);
+    glass.position.z = -D * 0.5;
+    cardGroup.add(glass);
+
+    // Rim glow line — very thin emissive strip on each edge
+    addRimLine(0,  H/2, 0, W, T * 0.15, 0.002);
+    addRimLine(0, -H/2, 0, W, T * 0.15, 0.002);
   }
 
-  /* ==========================================================================
-     9. INTERACTIVE TOUCH & DRAG ROTATION CONTROLS
-     ========================================================================= */
-  function onPointerDown(clientX, clientY) {
-    isDragging = true;
-    isNavSnapping = false;
-    prevPointerX = clientX;
-    prevPointerY = clientY;
-    velocityY = 0;
-    velocityX = 0;
+  function addEdge(x, y, z, w, h, d, mat) {
+    const geo  = new THREE.BoxGeometry(w, h, d);
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(x, y, z);
+    cardGroup.add(mesh);
+  }
+
+  function addRimLine(x, y, z, w, h, d) {
+    const rimMat = new THREE.MeshBasicMaterial({
+      color:        PALETTE.lavender,
+      transparent:  true,
+      opacity:      0.55
+    });
+    const geo  = new THREE.BoxGeometry(w, h, d);
+    const mesh = new THREE.Mesh(geo, rimMat);
+    mesh.position.set(x, y, z);
+    cardGroup.add(mesh);
+  }
+
+  function setupCardLights() {
+    const keyL = new THREE.PointLight(PALETTE.lavender, 2.2, 20);
+    keyL.position.set(4, 5, 6);
+    cardScene.add(keyL);
+
+    const fillL = new THREE.PointLight(PALETTE.purple, 1.6, 18);
+    fillL.position.set(-5, -3, 5);
+    cardScene.add(fillL);
+
+    const rimL = new THREE.PointLight(PALETTE.lilac, 2.0, 15);
+    rimL.position.set(0, 4, -6);
+    cardScene.add(rimL);
+
+    cardScene.add(new THREE.AmbientLight(PALETTE.violet, 0.8));
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     10. CARD POINTER / TOUCH DRAG CONTROLS
+  ═══════════════════════════════════════════════════════════════════════ */
+  function bindCardPointer() {
+    const el = cardCanvas;
+
+    el.addEventListener('mousedown',  e => onDown(e.clientX, e.clientY));
+    window.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+    window.addEventListener('mouseup', onUp);
+
+    el.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) onDown(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+
+    window.addEventListener('touchmove', e => {
+      if (e.touches.length === 1) onMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+
+    window.addEventListener('touchend', onUp, { passive: true });
+
+    // Mouse parallax (desktop only)
+    window.addEventListener('mousemove', e => {
+      mouseNorm.x = (e.clientX / window.innerWidth)  * 2 - 1;
+      mouseNorm.y = (e.clientY / window.innerHeight) * 2 - 1;
+    });
+  }
+
+  function onDown(x, y) {
+    dragging = true;
+    prevPtr  = { x, y };
+    rotVel   = { y: 0, x: 0 };
 
     if (!hasInteracted) {
       hasInteracted = true;
-      if (dragHint) dragHint.classList.add('is-hidden');
+      if (dragHint) dragHint.classList.add('is-faded');
     }
   }
 
-  function onPointerMove(clientX, clientY) {
-    if (!isDragging) {
-      // Track mouse for subtle parallax
-      mouseX = (clientX / window.innerWidth) * 2 - 1;
-      mouseY = -(clientY / window.innerHeight) * 2 + 1;
-      targetCameraX = mouseX * 0.6;
-      targetCameraY = mouseY * 0.4;
-      return;
+  function onMove(x, y) {
+    if (!dragging) return;
+    const dx = x - prevPtr.x;
+    const dy = y - prevPtr.y;
+    prevPtr  = { x, y };
+
+    const sense = isMobile() ? 0.005 : 0.007;
+    rotTarget.y  += dx * sense;
+    rotTarget.x  += dy * sense * 0.45;
+    rotTarget.x   = Math.max(-0.35, Math.min(0.35, rotTarget.x));
+    rotVel.y      = dx * sense;
+    rotVel.x      = dy * sense * 0.45;
+  }
+
+  function onUp() {
+    dragging = false;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     11. WISH PARTICLE BURST (background layer)
+  ═══════════════════════════════════════════════════════════════════════ */
+  function triggerWishParticles() {
+    if (!bgScene || prefersLess) return;
+    const count = isMobile() ? 80 : 160;
+    const geo   = new THREE.BufferGeometry();
+    const pos   = new Float32Array(count * 3);
+    const col   = new Float32Array(count * 3);
+    const vels  = [];
+    const pal   = [
+      new THREE.Color(PALETTE.warmWhite),
+      new THREE.Color(PALETTE.lilac),
+      new THREE.Color(PALETTE.lavender)
+    ];
+
+    for (let i = 0; i < count; i++) {
+      pos[i*3] = (Math.random()-0.5)*4;
+      pos[i*3+1] = (Math.random()-0.5)*6;
+      pos[i*3+2] = (Math.random()-0.5)*2;
+
+      const th  = Math.random()*Math.PI*2;
+      const phi = Math.acos(Math.random()*2-1);
+      const spd = 5 + Math.random()*9;
+      vels.push({ x: spd*Math.sin(phi)*Math.cos(th),
+                  y: spd*Math.sin(phi)*Math.sin(th),
+                  z: spd*Math.cos(phi),
+                  drag: 0.93+Math.random()*0.04 });
+
+      const c = pal[Math.floor(Math.random()*pal.length)];
+      col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;
     }
 
-    const deltaX = clientX - prevPointerX;
-    const deltaY = clientY - prevPointerY;
+    geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+    geo.setAttribute('color',    new THREE.BufferAttribute(col,3));
 
-    prevPointerX = clientX;
-    prevPointerY = clientY;
-
-    // Rotation sensitivity
-    const sensitivity = 0.0075;
-    targetRotationY += deltaX * sensitivity;
-    targetRotationX += deltaY * sensitivity * 0.5;
-
-    // Clamp X tilt to keep card elegantly upright
-    targetRotationX = Math.max(-0.4, Math.min(0.4, targetRotationX));
-
-    velocityY = deltaX * sensitivity;
-    velocityX = deltaY * sensitivity * 0.5;
-  }
-
-  function onPointerUp() {
-    isDragging = false;
-  }
-
-  // Desktop Mouse Events
-  container.addEventListener('mousedown', (e) => onPointerDown(e.clientX, e.clientY));
-  window.addEventListener('mousemove', (e) => onPointerMove(e.clientX, e.clientY));
-  window.addEventListener('mouseup', onPointerUp);
-
-  // Mobile Touch Events (Single-finger drag)
-  container.addEventListener(
-    'touchstart',
-    (e) => {
-      if (e.touches.length === 1) {
-        onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
-      }
-    },
-    { passive: true }
-  );
-
-  window.addEventListener(
-    'touchmove',
-    (e) => {
-      if (e.touches.length === 1) {
-        onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
-      }
-    },
-    { passive: true }
-  );
-
-  window.addEventListener('touchend', onPointerUp, { passive: true });
-
-  /* ==========================================================================
-     10. FACE NAVIGATION DOCK & ROTATION SNAPPING
-     ========================================================================== */
-  function snapToFace(index) {
-    isNavSnapping = true;
-    currentFaceIndex = index;
-
-    // Calculate nearest equivalent angle to avoid spinning around unnecessarily
-    const targetAngle = FACET_MESSAGES[index].angle;
-    const currentAngle = targetRotationY;
-    const twoPi = Math.PI * 2;
-
-    // Normalize to closest rotation
-    const turns = Math.round((currentAngle - targetAngle) / twoPi);
-    targetRotationY = turns * twoPi + targetAngle;
-    targetRotationX = 0; // Level out tilt
-
-    // Update active state in nav dock
-    faceNavBtns.forEach((btn, idx) => {
-      btn.classList.toggle('is-active', idx === index);
+    const mat  = new THREE.PointsMaterial({
+      size:0.5, map:makeGlowSprite(), transparent:true, opacity:1,
+      vertexColors:true, blending:THREE.AdditiveBlending, depthWrite:false
     });
 
-    // Sound chime on face select
-    audio.playBellTone(500 + index * 120);
-
-    if (!hasInteracted) {
-      hasInteracted = true;
-      if (dragHint) dragHint.classList.add('is-hidden');
-    }
+    const pts = new THREE.Points(geo, mat);
+    bgScene.add(pts);
+    wishBursts.push({ mesh:pts, vels, life:1, decay:0.014 });
   }
 
-  faceNavBtns.forEach((btn) => {
-    const handleFaceSelect = (e) => {
-      e.stopPropagation();
-      const faceIdx = parseInt(btn.getAttribute('data-face') || '0', 10);
-      snapToFace(faceIdx);
-    };
+  /* ═══════════════════════════════════════════════════════════════════════
+     12. RESIZE HANDLER
+  ═══════════════════════════════════════════════════════════════════════ */
+  function onResize() {
+    if (bgCamera && bgRenderer) {
+      bgCamera.aspect = window.innerWidth / window.innerHeight;
+      bgCamera.updateProjectionMatrix();
+      bgRenderer.setSize(window.innerWidth, window.innerHeight);
+    }
 
-    btn.addEventListener('click', handleFaceSelect);
-    btn.addEventListener('touchend', handleFaceSelect, { passive: true });
-  });
-
-  // Calculate current active face based on rotation angle for HUD dock
-  function updateActiveFaceFromRotation() {
-    if (isNavSnapping) return;
-    const twoPi = Math.PI * 2;
-    let norm = (currentRotationY % twoPi + twoPi) % twoPi; // [0, 2pi)
-
-    let closestIndex = 0;
-    let minDiff = Infinity;
-
-    FACET_MESSAGES.forEach((facet) => {
-      let diff = Math.abs(norm - facet.angle);
-      if (diff > Math.PI) diff = twoPi - diff;
-      if (diff < minDiff) {
-        minDiff = diff;
-        closestIndex = facet.index;
+    if (cardCamera && cardRenderer && cardCanvas) {
+      const W = cardCanvas.offsetWidth;
+      const H = cardCanvas.offsetHeight;
+      if (W > 0 && H > 0) {
+        cardCamera.aspect = W / H;
+        cardCamera.updateProjectionMatrix();
+        cardRenderer.setSize(W, H);
       }
-    });
-
-    if (closestIndex !== currentFaceIndex) {
-      currentFaceIndex = closestIndex;
-      faceNavBtns.forEach((btn, idx) => {
-        btn.classList.toggle('is-active', idx === closestIndex);
-      });
     }
   }
 
-  /* ==========================================================================
-     11. "MAKE A WISH" & MODAL CELEBRATION
-     ========================================================================== */
-  function openWishModal() {
-    // 1. Particle burst from card
-    triggerParticleBurst();
+  window.addEventListener('resize', onResize);
 
-    // 2. Play celestial sound chord
-    audio.playWishCelebration();
-
-    // 3. Open modal
-    if (wishModal) {
-      wishModal.classList.add('is-open');
-      wishModal.setAttribute('aria-hidden', 'false');
-    }
-
-    // Set dynamic date in modal
-    if (modalDateDisplay) {
-      const today = new Date();
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      modalDateDisplay.textContent = `Sent with love on ${today.toLocaleDateString('en-US', options)} • Timeless`;
-    }
-  }
-
-  function closeWishModal() {
-    if (wishModal) {
-      wishModal.classList.remove('is-open');
-      wishModal.setAttribute('aria-hidden', 'true');
-    }
-  }
-
-  if (makeWishBtn) {
-    makeWishBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      openWishModal();
-    });
-    makeWishBtn.addEventListener(
-      'touchend',
-      (e) => {
-        e.preventDefault();
-        openWishModal();
-      },
-      { passive: false }
-    );
-  }
-
-  if (modalCloseBtn) {
-    modalCloseBtn.addEventListener('click', closeWishModal);
-  }
-
-  if (modalDismissBtn) {
-    modalDismissBtn.addEventListener('click', closeWishModal);
-  }
-
-  if (modalBackdrop) {
-    modalBackdrop.addEventListener('click', closeWishModal);
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeWishModal();
-  });
-
-  /* ==========================================================================
-     12. AUDIO TOGGLE CONTROLS
-     ========================================================================== */
-  if (soundToggleBtn) {
-    soundToggleBtn.addEventListener('click', () => {
-      if (!audio.isPlaying) {
-        audio.startAmbient();
-        soundToggleBtn.classList.add('is-active');
-        if (soundBtnText) soundBtnText.textContent = 'Mute Chimes';
-      } else {
-        audio.stopAmbient();
-        soundToggleBtn.classList.remove('is-active');
-        if (soundBtnText) soundBtnText.textContent = 'Ambient Chimes';
-      }
-    });
-  }
-
-  /* ==========================================================================
-     13. RENDER & ANIMATION LOOP
-     ========================================================================== */
+  /* ═══════════════════════════════════════════════════════════════════════
+     13. ANIMATION LOOP
+  ═══════════════════════════════════════════════════════════════════════ */
   function animate() {
     requestAnimationFrame(animate);
 
-    const delta = clock.getDelta();
-    const elapsedTime = clock.getElapsedTime();
+    const t   = Date.now() * 0.001;
+    const dt  = cardClock ? cardClock.getDelta() : 0.016;
 
-    // 1. Card Inertia and Smooth Rotation
-    if (!isDragging) {
-      // Apply momentum friction
-      targetRotationY += velocityY;
-      targetRotationX += velocityX;
-      velocityY *= 0.92;
-      velocityX *= 0.92;
-
-      // Gentle idle breathing floating motion when untouched
-      if (!isNavSnapping && Math.abs(velocityY) < 0.001) {
-        targetRotationY += 0.002; // Slow auto-orbit
-      }
-    }
-
-    // Smooth lerp to target rotation
-    currentRotationY += (targetRotationY - currentRotationY) * (isNavSnapping ? 0.08 : 0.06);
-    currentRotationX += (targetRotationX - currentRotationX) * 0.08;
-
-    if (cardGroup) {
-      cardGroup.rotation.y = currentRotationY;
-      cardGroup.rotation.x = currentRotationX;
-
-      // Gentle vertical hover/floating bob
-      cardGroup.position.y = Math.sin(elapsedTime * 1.5) * 0.12;
-      cardGroup.rotation.z = Math.sin(elapsedTime * 0.8) * 0.02;
-    }
-
-    // Update active face state in HUD
-    updateActiveFaceFromRotation();
-
-    // 2. Galaxy Particles Slow Orbit & Wave
-    if (galaxyPoints) {
-      galaxyPoints.rotation.y = elapsedTime * 0.035;
-      galaxyPoints.rotation.x = Math.sin(elapsedTime * 0.02) * 0.05;
-    }
-
-    // 3. Parallax Camera Shift
-    camera.position.x += (targetCameraX - camera.position.x) * 0.05;
-    camera.position.y += (targetCameraY + 0.2 - camera.position.y) * 0.05;
-    camera.lookAt(0, 0, 0);
-
-    // 4. Smooth Light Recovery from Wish Surge
-    if (keyPointLight && keyPointLight.intensity > 2.8) {
-      keyPointLight.intensity += (2.8 - keyPointLight.intensity) * 0.04;
-    }
-
-    // 5. Update Particle Bursts
-    for (let i = burstPointsGroup.length - 1; i >= 0; i--) {
-      const burst = burstPointsGroup[i];
-      const posAttr = burst.mesh.geometry.attributes.position;
-      const positions = posAttr.array;
-
-      for (let j = 0; j < burst.velocities.length; j++) {
-        const vel = burst.velocities[j];
-        positions[j * 3] += vel.x * delta;
-        positions[j * 3 + 1] += vel.y * delta;
-        positions[j * 3 + 2] += vel.z * delta;
-
-        vel.x *= vel.drag;
-        vel.y *= vel.drag;
-        vel.z *= vel.drag;
+    // ── Background ──
+    if (bgScene && bgRenderer && bgCamera) {
+      if (starsPoints && !prefersLess) {
+        starsPoints.rotation.y = t * 0.012;
+        starsPoints.rotation.x = Math.sin(t * 0.008) * 0.04;
       }
 
-      posAttr.needsUpdate = true;
+      // Wish burst particles
+      for (let i = wishBursts.length - 1; i >= 0; i--) {
+        const b   = wishBursts[i];
+        const arr = b.mesh.geometry.attributes.position.array;
 
-      burst.life -= burst.decay;
-      burst.mesh.material.opacity = Math.max(0, burst.life);
+        for (let j = 0; j < b.vels.length; j++) {
+          const v = b.vels[j];
+          arr[j*3]   += v.x * dt;
+          arr[j*3+1] += v.y * dt;
+          arr[j*3+2] += v.z * dt;
+          v.x *= v.drag; v.y *= v.drag; v.z *= v.drag;
+        }
 
-      if (burst.life <= 0) {
-        scene.remove(burst.mesh);
-        burst.mesh.geometry.dispose();
-        burst.mesh.material.dispose();
-        burstPointsGroup.splice(i, 1);
+        b.mesh.geometry.attributes.position.needsUpdate = true;
+        b.life -= b.decay;
+        b.mesh.material.opacity = Math.max(0, b.life);
+
+        if (b.life <= 0) {
+          bgScene.remove(b.mesh);
+          b.mesh.geometry.dispose();
+          b.mesh.material.dispose();
+          wishBursts.splice(i, 1);
+        }
       }
+
+      bgRenderer.render(bgScene, bgCamera);
     }
 
-    renderer.render(scene, camera);
+    // ── 3D Card Frame ──
+    if (cardScene && cardRenderer && cardCamera && cardGroup) {
+      if (!prefersLess) {
+        // Inertia
+        if (!dragging) {
+          rotTarget.y += rotVel.y;
+          rotTarget.x += rotVel.x;
+          rotVel.y    *= 0.92;
+          rotVel.x    *= 0.92;
+        }
+
+        // Smooth lerp
+        const lerpF = 0.065;
+        rotCurrent.y += (rotTarget.y - rotCurrent.y) * lerpF;
+        rotCurrent.x += (rotTarget.x - rotCurrent.x) * lerpF;
+
+        cardGroup.rotation.y = rotCurrent.y;
+        cardGroup.rotation.x = rotCurrent.x;
+
+        // Floating bob
+        cardGroup.position.y = Math.sin(t * 1.4) * 0.06;
+        cardGroup.rotation.z = Math.sin(t * 0.75) * 0.012;
+
+        // Subtle mouse parallax
+        if (!dragging) {
+          cardCamera.position.x += (mouseNorm.x * 0.55 - cardCamera.position.x) * 0.05;
+          cardCamera.position.y += (-mouseNorm.y * 0.3 - cardCamera.position.y + 0) * 0.05;
+        }
+      }
+
+      cardRenderer.render(cardScene, cardCamera);
+    }
   }
 
-  /* ==========================================================================
-     14. WINDOW RESIZE HANDLING
-     ========================================================================== */
-  window.addEventListener('resize', () => {
-    if (!renderer || !camera) return;
+  /* ═══════════════════════════════════════════════════════════════════════
+     14. SYNC CARD CANVAS SIZE TO CSS CONTAINER
+  ═══════════════════════════════════════════════════════════════════════ */
+  function syncCardSize() {
+    if (!cardCanvas) return;
+    const panel = document.getElementById('keepsake-panel');
+    if (!panel) return;
+    const rect = panel.getBoundingClientRect();
+    cardCanvas.style.height = rect.height + 'px';
+  }
 
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+  /* ═══════════════════════════════════════════════════════════════════════
+     15. BOOT SEQUENCE
+  ═══════════════════════════════════════════════════════════════════════ */
+  function boot() {
+    initBackground();
 
-    updateCameraDistance();
+    // Wait one frame for the HTML text panel to render its natural height,
+    // THEN initialize the 3D card frame canvas to match.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        syncCardSize();
+        initCard();
+        animate();
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  });
+        // Fade out loading veil
+        setTimeout(() => {
+          if (loadingVeil) loadingVeil.classList.add('is-gone');
+        }, 400);
+      });
+    });
 
-  /* ==========================================================================
-     15. INITIALIZATION
-     ========================================================================== */
-  window.addEventListener('DOMContentLoaded', () => {
-    initThreeScene();
-    animate();
-  });
+    // Re-sync on resize (panel height can change on mobile keyboard open, orientation change)
+    window.addEventListener('resize', () => {
+      requestAnimationFrame(() => { syncCardSize(); onResize(); });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+
 })();

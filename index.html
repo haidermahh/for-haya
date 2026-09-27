@@ -1,187 +1,303 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="celestial">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>For Haya ✨ | A Celestial Birthday Keepsake</title>
-  
-  <!-- SEO & Sharing Metadata -->
-  <meta name="description" content="An interactive 3D celestial keepsake gift crafted with love for Haya. Touch, drag, and explore." />
-  <meta name="theme-color" content="#0d0812" />
+  <title>For Haya ✦ A Digital Keepsake</title>
+
+  <meta name="description" content="A premium celestial digital birthday keepsake crafted with love for Haya." />
+  <meta name="theme-color" content="#07030D" />
+  <meta property="og:title" content="For Haya ✦ A Digital Keepsake" />
+  <meta property="og:description" content="A luxury 3D interactive birthday keepsake created specially for Haya." />
+  <meta property="og:type" content="website" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-  <!-- Open Graph & Social Cards -->
-  <meta property="og:title" content="For Haya ✨ | A Celestial Birthday Keepsake" />
-  <meta property="og:description" content="An interactive 3D floating keepsake gift crafted with love for Haya. Drag and rotate to uncover her birthday blessings." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://lovely-haya.vercel.app" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="For Haya ✨" />
-  <meta name="twitter:description" content="A 3D interactive floating keepsake celebrating Haya." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>" />
 
-  <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>" />
-
-  <!-- Google Fonts: Cormorant Garamond (Display Serif), Jost (Geometric Sans), Playfair Display -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
 
-  <!-- Three.js (CDN) -->
+  <!-- Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-  <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- ============================================================
-       1. LOADING SCREEN (Smooth WebGL Shader / Texture Initialization)
-       ============================================================ -->
-  <div id="loading-screen" class="loading-screen" aria-live="polite">
-    <div class="loader-content">
-      <div class="loader-crystal-core">
-        <div class="crystal-orbit ring-1"></div>
-        <div class="crystal-orbit ring-2"></div>
-        <div class="crystal-gem">✦</div>
-      </div>
-      <p class="loader-text">Opening your gift for Haya…</p>
-      <div class="loader-bar-wrap">
-        <div class="loader-bar-fill"></div>
-      </div>
-    </div>
+  <!-- ═══════════════════════════════════════════════════
+       LOADING VEIL
+  ════════════════════════════════════════════════════ -->
+  <div id="loading-veil" class="loading-veil" role="status" aria-label="Opening your gift">
+    <div class="veil-monogram">H</div>
+    <p class="veil-caption">Opening your gift…</p>
   </div>
 
-  <!-- ============================================================
-       2. WEBGL THREE.JS CANVAS CONTAINER
-       ============================================================ -->
-  <div id="canvas-container" class="canvas-container" aria-hidden="true"></div>
+  <!-- ═══════════════════════════════════════════════════
+       CELESTIAL BACKGROUND CANVAS (Three.js)
+  ════════════════════════════════════════════════════ -->
+  <div id="bg-canvas" class="bg-canvas" aria-hidden="true"></div>
 
-  <!-- ============================================================
-       3. AMBIENT LUXURY HEADER OVERLAY
-       ============================================================ -->
-  <header class="keepsake-header">
-    <div class="header-monogram">
-      <span class="monogram-emblem">H</span>
-      <div class="monogram-text">
-        <span class="monogram-title">FOR HAYA</span>
-        <span class="monogram-sub">A 3D Digital Keepsake ✦</span>
+  <!-- ═══════════════════════════════════════════════════
+       VIGNETTE OVERLAY
+  ════════════════════════════════════════════════════ -->
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- ═══════════════════════════════════════════════════
+       HEADER
+  ════════════════════════════════════════════════════ -->
+  <header class="site-header" role="banner">
+    <div class="brand-mark">
+      <div class="brand-monogram" aria-hidden="true">H</div>
+      <div class="brand-text">
+        <span class="brand-title">FOR HAYA</span>
+        <span class="brand-sub">A DIGITAL KEEPSAKE</span>
       </div>
     </div>
 
-    <div class="header-controls">
-      <button id="sound-toggle-btn" class="purple-pill-btn" aria-label="Toggle ethereal ambient chimes" title="Toggle Sound">
-        <span class="audio-waves" aria-hidden="true">
-          <span></span><span></span><span></span>
-        </span>
-        <span id="sound-btn-text">Ambient Chimes</span>
-      </button>
-    </div>
+    <button
+      id="chime-toggle"
+      class="chime-btn"
+      aria-label="Toggle ambient chimes"
+      aria-pressed="false"
+    >
+      <span class="chime-icon" aria-hidden="true">
+        <span class="bar b1"></span>
+        <span class="bar b2"></span>
+        <span class="bar b3"></span>
+      </span>
+      <span class="chime-label">AMBIENT CHIMES</span>
+    </button>
   </header>
 
-  <!-- ============================================================
-       4. INTERACTION HINTS & FLOATING HUD
-       ============================================================ -->
-  <div id="drag-hint" class="drag-hint" aria-hidden="true">
-    <span class="drag-icon">✦</span>
-    <span class="drag-text">Drag to explore the keepsake in 3D</span>
-    <span class="drag-icon">✦</span>
-  </div>
+  <!-- ═══════════════════════════════════════════════════
+       MAIN STAGE
+  ════════════════════════════════════════════════════ -->
+  <main class="stage" role="main">
 
-  <!-- Face Quick-Navigation Dock -->
-  <nav class="face-nav" aria-label="Keepsake Facets">
-    <button class="face-nav-btn is-active" data-face="0" aria-label="Show Front Face: Tribute">
-      <span class="nav-dot">✦</span>
-      <span class="nav-label">Genesis</span>
-    </button>
-    <button class="face-nav-btn" data-face="1" aria-label="Show Side Face: Grace">
-      <span class="nav-dot">✦</span>
-      <span class="nav-label">Grace</span>
-    </button>
-    <button class="face-nav-btn" data-face="2" aria-label="Show Back Face: Journey">
-      <span class="nav-dot">✦</span>
-      <span class="nav-label">Journey</span>
-    </button>
-    <button class="face-nav-btn" data-face="3" aria-label="Show Side Face: Wish">
-      <span class="nav-dot">✦</span>
-      <span class="nav-label">Blessing</span>
-    </button>
-  </nav>
+    <!-- Drag hint -->
+    <p id="drag-hint" class="drag-hint" aria-hidden="true">
+      <span class="hint-gem">✦</span>
+      DRAG TO EXPLORE THE KEEPSAKE IN 3D
+      <span class="hint-gem">✦</span>
+    </p>
 
-  <!-- ============================================================
-       5. INTERACTIVE MOMENT: "MAKE A WISH" CTA
-       ============================================================ -->
-  <div class="wish-action-bar">
-    <button id="make-wish-btn" class="purple-wish-btn" aria-label="Make a Birthday Wish for Haya">
-      <div class="btn-aura-glow"></div>
-      <span class="btn-sparkle left">✦</span>
-      <span class="btn-label">Make a Wish, Even Now</span>
-      <span class="btn-sparkle right">✦</span>
-    </button>
-  </div>
+    <!-- 3D Keepsake Vessel + HTML Text Layer -->
+    <div class="keepsake-wrapper">
 
-  <!-- ============================================================
-       6. WISH REVELATION MODAL
-       ============================================================ -->
-  <div id="wish-modal" class="wish-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-title">
-    <div class="modal-backdrop" id="modal-backdrop"></div>
-    <div class="modal-card">
-      <button class="modal-close-btn" id="modal-close-btn" aria-label="Close blessing">✕</button>
+      <!-- Three.js 3D card canvas — purely decorative glass frame -->
+      <div id="card-canvas" class="card-canvas" aria-hidden="true"></div>
 
-      <span class="modal-corner-gem tl">✦</span>
-      <span class="modal-corner-gem tr">✦</span>
-      <span class="modal-corner-gem bl">✦</span>
-      <span class="modal-corner-gem br">✦</span>
+      <!-- HTML Text Panel — lives inside the keepsake, never clips -->
+      <div class="keepsake-text-panel" id="keepsake-panel">
 
-      <div class="modal-badge">
-        <span class="badge-line"></span>
-        <span class="badge-title">✦ A SACRED CELESTIAL WISH ✦</span>
-        <span class="badge-line"></span>
-      </div>
+        <!-- ── GENESIS ── -->
+        <article class="chapter" id="ch-genesis" role="tabpanel" aria-labelledby="tab-genesis" data-chapter="genesis">
+          <header class="ch-header">
+            <span class="ch-kicker">✦ A TIMELESS KEEPSAKE ✦</span>
+          </header>
 
-      <div class="modal-icon-stage">
-        <div class="modal-icon-halo"></div>
-        <span class="modal-icon">🔮</span>
-      </div>
+          <div class="ch-monogram-ring" aria-hidden="true">
+            <svg viewBox="0 0 100 100" class="ring-svg">
+              <circle cx="50" cy="50" r="44" stroke="rgba(200,167,232,0.35)" stroke-width="1" fill="none" stroke-dasharray="4 5" />
+              <circle cx="50" cy="50" r="36" stroke="rgba(200,167,232,0.6)" stroke-width="0.8" fill="none" />
+            </svg>
+            <span class="ch-monogram-letter">H</span>
+          </div>
 
-      <h3 id="modal-title" class="modal-headline">
-        “Some wishes refuse to be bound by a calendar.<br>
-        <span class="headline-italic">Yours is already written across the stars.”</span>
-      </h3>
+          <div class="ch-dedication">
+            <span class="dedication-label">DEDICATED TO</span>
+            <h1 class="ch-name">Haya Madam G</h1>
+            <div class="ch-name-ornament" aria-hidden="true">
+              <span class="ornament-line"></span>
+              <span class="ornament-gem">✦</span>
+              <span class="ornament-line"></span>
+            </div>
+            <p class="ch-date">May 5th, 2009 &ensp;·&ensp; A Radiant Soul</p>
+          </div>
 
-      <div class="modal-divider">
-        <span class="divider-gem">✧</span>
-      </div>
+          <p class="ch-body-text">
+            Some celebrations arrive exactly when the heart needs them most —
+            not bound to a date on the calendar, but woven into the fabric of
+            everything you mean to the people who are lucky enough to know you.
+          </p>
+        </article>
 
-      <p class="modal-body-text">
-        May every quiet dream you carry find open sky. Happy Belated Birthday, Haya — may this year grant you unshakeable peace, effortless laughter, and the unwavering courage to shine with your own rare brilliance.
-      </p>
+        <!-- ── GRACE ── -->
+        <article class="chapter is-hidden" id="ch-grace" role="tabpanel" aria-labelledby="tab-grace" data-chapter="grace">
+          <header class="ch-header">
+            <span class="ch-kicker">✦ GRACE ✦</span>
+          </header>
+          <h2 class="ch-title">
+            The Kind of Light<br />
+            <em>That Stays</em>
+          </h2>
+          <div class="ch-divider" aria-hidden="true">
+            <span class="div-line"></span>
+            <span class="div-gem">✧</span>
+            <span class="div-line"></span>
+          </div>
+          <p class="ch-body-text">
+            There is a rare kind of warmth that doesn't ask for attention — it
+            simply exists, steady and luminous, changing the quality of the
+            air in every room it enters. That is precisely the kind of presence
+            you carry. A quiet kindness that disarms the world before anyone
+            even notices it has arrived.
+          </p>
+          <p class="ch-body-text ch-body-text--secondary">
+            The world is measurably softer for having you in it, Haya.
+          </p>
+        </article>
 
-      <div class="modal-date-tag">
-        <span class="date-icon">✦</span>
-        <span id="modal-date-display">Sent with love • A Timeless Blessing</span>
-        <span class="date-icon">✦</span>
-      </div>
+        <!-- ── JOURNEY ── -->
+        <article class="chapter is-hidden" id="ch-journey" role="tabpanel" aria-labelledby="tab-journey" data-chapter="journey">
+          <header class="ch-header">
+            <span class="ch-kicker">✦ THE CELESTIAL WISH ✦</span>
+          </header>
+          <div class="ch-icon-row" aria-hidden="true">✦ ✧ ✦</div>
+          <h2 class="ch-title ch-title--serif-italic">Timeless Radiance</h2>
+          <div class="ch-divider" aria-hidden="true">
+            <span class="div-line"></span>
+            <span class="div-gem">✧</span>
+            <span class="div-line"></span>
+          </div>
+          <p class="ch-body-text">
+            Some wishes refuse to be contained by a single day on the calendar.
+            Though May 5th has quietly passed, the desire to celebrate your
+            presence remains as radiant, steadfast, and bright as ever.
+          </p>
+          <blockquote class="ch-quote">
+            "May this year be gentle with your heart, generous with your dreams,
+            and filled with magic you never saw coming."
+          </blockquote>
+          <p class="ch-body-text">
+            Never hurry who you are becoming. May each chapter grant you
+            unshakeable peace, effortless joy, and pride in everything you are.
+          </p>
+          <footer class="ch-signature">
+            <span class="sig-line">With warmth &amp; highest admiration</span>
+            <span id="journey-date" class="sig-date">September 27, 2026 · Timeless Tribute</span>
+          </footer>
+        </article>
 
-      <button id="modal-dismiss-btn" class="modal-dismiss-pill">
-        <span>Close & Continue Exploring</span>
+        <!-- ── BLESSING ── -->
+        <article class="chapter is-hidden" id="ch-blessing" role="tabpanel" aria-labelledby="tab-blessing" data-chapter="blessing">
+          <header class="ch-header">
+            <span class="ch-kicker">✦ A BLESSING FOR HAYA ✦</span>
+          </header>
+          <h2 class="ch-title">
+            May Your Light<br />
+            <em>Always Find Its Way</em>
+          </h2>
+          <div class="ch-divider" aria-hidden="true">
+            <span class="div-line"></span>
+            <span class="div-gem">✧</span>
+            <span class="div-line"></span>
+          </div>
+          <p class="ch-body-text">
+            May every morning arrive with something worth looking forward to.
+            May your confidence grow quietly but unshakeably. May you find
+            beauty in ordinary moments, courage when paths feel unclear, and
+            deep peace in the certainty that you are, without question,
+            enough — exactly as you are.
+          </p>
+          <p class="ch-body-text ch-body-text--secondary">
+            May meaningful friendships find you, beautiful opportunities choose
+            you, and the future you dream of make its way toward you gently
+            and inevitably.
+          </p>
+          <div class="ch-closing">
+            <span class="closing-name">For Haya ✦</span>
+            <span class="closing-warmth">With warmth, always.</span>
+          </div>
+        </article>
+
+      </div><!-- /keepsake-text-panel -->
+    </div><!-- /keepsake-wrapper -->
+
+    <!-- Chapter Navigation -->
+    <nav class="chapter-nav" role="tablist" aria-label="Keepsake chapters">
+      <button
+        class="chapter-tab is-active"
+        id="tab-genesis"
+        role="tab"
+        aria-selected="true"
+        aria-controls="ch-genesis"
+        data-chapter="genesis"
+      >
+        <span class="tab-dot" aria-hidden="true">✦</span>
+        <span class="tab-label">Genesis</span>
+      </button>
+      <button
+        class="chapter-tab"
+        id="tab-grace"
+        role="tab"
+        aria-selected="false"
+        aria-controls="ch-grace"
+        data-chapter="grace"
+      >
+        <span class="tab-dot" aria-hidden="true">✦</span>
+        <span class="tab-label">Grace</span>
+      </button>
+      <button
+        class="chapter-tab"
+        id="tab-journey"
+        role="tab"
+        aria-selected="false"
+        aria-controls="ch-journey"
+        data-chapter="journey"
+      >
+        <span class="tab-dot" aria-hidden="true">✦</span>
+        <span class="tab-label">Journey</span>
+      </button>
+      <button
+        class="chapter-tab"
+        id="tab-blessing"
+        role="tab"
+        aria-selected="false"
+        aria-controls="ch-blessing"
+        data-chapter="blessing"
+      >
+        <span class="tab-dot" aria-hidden="true">✦</span>
+        <span class="tab-label">Blessing</span>
+      </button>
+    </nav>
+
+    <!-- Make a Wish CTA -->
+    <div class="cta-zone">
+      <button id="wish-btn" class="wish-cta" aria-label="Make a wish for Haya">
+        <span class="wish-btn-glow" aria-hidden="true"></span>
+        <span class="wish-btn-text">✦ MAKE A WISH, EVEN NOW ✦</span>
       </button>
     </div>
+
+  </main><!-- /stage -->
+
+  <!-- ═══════════════════════════════════════════════════
+       WISH OVERLAY MODAL
+  ════════════════════════════════════════════════════ -->
+  <div id="wish-modal" class="wish-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Birthday wish">
+    <div class="wish-modal-backdrop" id="wish-modal-backdrop"></div>
+    <div class="wish-modal-card">
+      <button class="modal-close" id="wish-modal-close" aria-label="Close wish message">✕</button>
+      <div class="modal-gem-row" aria-hidden="true">✦ ✧ ✦</div>
+      <p class="modal-message">
+        "Some wishes are worth making, no matter the date."
+      </p>
+      <span class="modal-sub">Happy Birthday, Haya — always.</span>
+      <button class="modal-dismiss" id="wish-modal-dismiss">Close</button>
+    </div>
   </div>
 
-  <!-- ============================================================
-       7. REFINED DESIGNER SIGNATURE MARK
-       ============================================================ -->
+  <!-- ═══════════════════════════════════════════════════
+       MAKER CREDIT
+  ════════════════════════════════════════════════════ -->
   <aside class="maker-credit" role="contentinfo">
-    <div class="maker-mark">
-      <span class="maker-gem">✦</span>
-      <span class="maker-author">Made With <span class="heart-pulse">❤️</span> By Haider</span>
-    </div>
+    <span class="maker-name">MADE WITH ♥ BY HAIDER</span>
     <span class="maker-tagline">Turning code into feelings.</span>
   </aside>
 
-  <!-- Main 3D Experience Script -->
   <script src="script.js"></script>
 </body>
 </html>
