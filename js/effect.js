@@ -275,10 +275,10 @@ $('document').ready(function(){
 // Zoom (lightbox) feature with 5-photo gallery
 var galleryPhotos = [
     'assets/images/photo1.jpg',
+    'assets/images/photo5.jpg',
     'assets/images/photo2.jpg',
-    'assets/images/photo3.jpg',
     'assets/images/photo4.jpg',
-    'assets/images/photo5.jpg'
+    'assets/images/photo3.jpg'
 ];
 var currentPhotoIndex = 0;
 
