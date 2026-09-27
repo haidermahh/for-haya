@@ -346,15 +346,15 @@ html, body {
     width: clamp(210px, 16vw, 245px);
     height: clamp(140px, 11vw, 165px);
   }
-  .album-left-1  { top: 40px;  left: 3.5vw; transform: rotate(-5deg); }
-  .album-left-2  { top: 350px; left: 3.5vw; transform: rotate(4deg); }
-  .album-right-1 { top: 40px;  right: 3.5vw; transform: rotate(5deg); }
-  .album-right-2 { top: 350px; right: 3.5vw; transform: rotate(-4deg); }
+  .album-left-1  { top: 88px;  left: 3.5vw; transform: rotate(-5deg); }
+  .album-left-2  { top: 390px; left: 3.5vw; transform: rotate(4deg); }
+  .album-right-1 { top: 88px;  right: 3.5vw; transform: rotate(5deg); }
+  .album-right-2 { top: 390px; right: 3.5vw; transform: rotate(-4deg); }
   .can-zoom {
     display: none;
     position: absolute;
     right: 4.5vw;
-    top: 525px;
+    top: 565px;
     width: 135px;
     z-index: 6;
   }
@@ -368,7 +368,7 @@ html, body {
     transform-origin: center top;
   }
   .message {
-    top: 56% !important;
+    top: 50% !important;
     width: 90% !important;
     max-width: 800px;
   }
@@ -387,20 +387,20 @@ html, body {
     height: 112px;
     border-width: 4px;
   }
-  .album-left-1  { top: 45px;  left: 16px; transform: rotate(-4deg); }
-  .album-left-2  { top: 330px; left: 16px; transform: rotate(3deg); }
-  .album-right-1 { top: 45px;  right: 16px; transform: rotate(4deg); }
-  .album-right-2 { top: 330px; right: 16px; transform: rotate(-3deg); }
+  .album-left-1  { top: 78px;  left: 16px; transform: rotate(-4deg); }
+  .album-left-2  { top: 360px; left: 16px; transform: rotate(3deg); }
+  .album-right-1 { top: 78px;  right: 16px; transform: rotate(4deg); }
+  .album-right-2 { top: 360px; right: 16px; transform: rotate(-3deg); }
   .can-zoom {
     display: none;
     position: absolute;
     right: 18px;
-    top: 450px;
+    top: 480px;
     width: 110px;
     z-index: 6;
   }
   .bannar {
-    max-width: 340px !important;
+    max-width: 300px !important;
     margin: 6px auto 0;
   }
   .cake {
@@ -409,7 +409,7 @@ html, body {
     transform-origin: center top;
   }
   .message {
-    top: 58% !important;
+    top: 50% !important;
     width: 90% !important;
     max-width: 650px;
   }
@@ -424,32 +424,32 @@ html, body {
 /* Mobile Devices (<= 767px) - Android & iPhone */
 @media (max-width: 767px) {
   .album-photo {
-    width: clamp(92px, 25vw, 115px);
-    height: clamp(66px, 18vw, 82px);
+    width: clamp(82px, 22.5vw, 100px);
+    height: clamp(58px, 16vw, 72px);
     border: 3px solid white;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     z-index: 5;
   }
-  .album-left-1  { top: 55px;  left: 8px;  transform: rotate(-4deg); }
-  .album-right-1 { top: 55px;  right: 8px; transform: rotate(4deg); }
-  .album-left-2  { top: 305px; left: 8px;  transform: rotate(3deg); }
-  .album-right-2 { top: 305px; right: 8px; transform: rotate(-3deg); }
+  .album-left-1  { top: 68px;  left: 6px;  transform: rotate(-4deg); }
+  .album-right-1 { top: 68px;  right: 6px; transform: rotate(4deg); }
+  .album-left-2  { top: 295px; left: 6px;  transform: rotate(3deg); }
+  .album-right-2 { top: 295px; right: 6px; transform: rotate(-3deg); }
   .can-zoom {
     display: none;
     position: absolute;
-    right: 10px;
-    top: 395px;
-    width: 82px;
+    right: 8px;
+    top: 375px;
+    width: 76px;
     z-index: 6;
   }
   .bannar {
-    max-width: 58% !important;
+    max-width: 44% !important;
     margin: 4px auto 0 !important;
   }
   .cake {
-    top: min(39vh, 235px) !important;
-    transform: scale(0.65) !important;
+    top: min(44vh, 260px) !important;
+    transform: scale(0.62) !important;
     transform-origin: center top;
     z-index: 10;
   }
@@ -467,7 +467,7 @@ html, body {
     padding-right: 2px;
   }
   .message {
-    top: 64% !important;
+    top: 46% !important;
     width: 95% !important;
     max-width: 420px;
     padding: 0 10px;
@@ -475,7 +475,7 @@ html, body {
   .message p {
     font-size: clamp(20px, 5.2vw, 32px) !important;
     line-height: 1.35 !important;
-    margin: 8px 0 !important;
+    margin: 6px 0 !important;
     text-shadow: 2px 2px 3px #FFF, 0 0 8px #FFF !important;
   }
   .navbar-fixed-bottom {
@@ -492,25 +492,28 @@ html, body {
 /* Very Small Mobile (<= 360px) */
 @media (max-width: 360px) {
   .album-photo {
-    width: 82px;
-    height: 58px;
+    width: 76px;
+    height: 54px;
     border-width: 2px;
   }
-  .album-left-1  { top: 50px;  left: 4px; }
-  .album-right-1 { top: 50px;  right: 4px; }
-  .album-left-2  { top: 285px; left: 4px; }
-  .album-right-2 { top: 285px; right: 4px; }
-  .can-zoom { width: 72px; top: 350px; right: 4px; }
+  .album-left-1  { top: 62px;  left: 4px; }
+  .album-right-1 { top: 62px;  right: 4px; }
+  .album-left-2  { top: 275px; left: 4px; }
+  .album-right-2 { top: 275px; right: 4px; }
+  .can-zoom { width: 68px; top: 345px; right: 4px; }
+  .bannar {
+    max-width: 40% !important;
+  }
   .cake {
-    top: 220px !important;
-    transform: scale(0.56) !important;
+    top: 230px !important;
+    transform: scale(0.55) !important;
     transform-origin: center top;
   }
   .profile-img {
     display: none !important;
   }
   .message {
-    top: 64% !important;
+    top: 45% !important;
   }
   .message p {
     font-size: 18px !important;

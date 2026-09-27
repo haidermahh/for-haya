@@ -45,7 +45,7 @@ $('document').ready(function(){
 			var balloonH = Math.round(balloonW * 1.83);
 			var spacing = Math.floor((winW - 60) / 7);
 			var startLeft = Math.round((winW - (spacing * 6 + balloonW)) / 2);
-			var topPos = 185;
+			var topPos = 215; // Sits comfortably below banner
 
 			$('.balloons').css({
 				'width': balloonW + 'px',
@@ -72,7 +72,7 @@ $('document').ready(function(){
 			var spacing = 80;
 			var totalW = spacing * 6 + balloonW;
 			var startLeft = Math.round(vw - (totalW / 2));
-			var topPos = 190; // Sits below top banner/photos (40-195px) and above bottom photos (350-515px)
+			var topPos = 240; // Sits below top banner (ends ~180px) and above bottom photos (390px)
 
 			$('.balloons').css({
 				'width': balloonW + 'px',
@@ -247,9 +247,8 @@ $('document').ready(function(){
 	
 	$('#story').click(function(){
 		$(this).fadeOut('slow');
-		$('.cake').fadeOut('fast').promise().done(function(){
-			$('.message').fadeIn('slow');
-		});
+		$('.can-zoom').fadeOut('slow');
+		$('.message').fadeIn('slow');
 
 		var $messages = $(".message p");   // only inside .message
 		var totalMessages = $messages.length;
@@ -260,10 +259,8 @@ $('document').ready(function(){
 					msgLoop(i + 1);
 				});
 			} else {
-				// Last message stays + cake comes back
-				$messages.eq(i).fadeIn('slow').promise().done(function(){
-					$('.cake').fadeIn('fast');
-				});
+				// Last message stays crowned above the cake
+				$messages.eq(i).fadeIn('slow');
 			}
 		}
 
