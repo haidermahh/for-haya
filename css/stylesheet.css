@@ -4,13 +4,21 @@
        url('../assets/fonts/Happy.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 @font-face {
-  font-family: 'Signika';
-  src: url('../assets/fonts/Happy.ttf') format('truetype'),
-       url('../assets/fonts/Sweet-Toffee.ttf') format('truetype');
+  font-family: 'Sweet-Toffee';
+  src: url('../assets/fonts/Sweet-Toffee.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Happy-Alt';
+  src: url('../assets/fonts/Happy.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
 html, body {
@@ -34,28 +42,71 @@ html, body {
 
 /* Overlay */
 .lightbox {
-  display: none; /* stays hidden at first */
+  display: none;
   position: fixed;
   top: 0; left: 0;
   width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0,0,0,0.88);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   justify-content: center;
   align-items: center;
   z-index: 99999;
+  cursor: zoom-out;
+}
+
+.lightbox-content {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 92vw;
+  max-height: 88vh;
+  cursor: default;
 }
 
 /* Enlarged image */
-.lightbox img {
-  max-width: 90vw;
-  max-height: 85vh;
-  width: auto;
-  height: auto;
+.lightbox img, #lightbox-img {
+  display: block !important;
+  max-width: min(88vw, 760px) !important;
+  max-height: 82vh !important;
+  min-width: 180px;
+  min-height: 120px;
+  width: auto !important;
+  height: auto !important;
   border-radius: 12px;
   border: 4px solid white;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.75), 0 0 25px rgba(255,255,255,0.25);
+  object-fit: contain !important;
   animation: fadeIn 0.3s ease;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  width: 36px;
+  height: 36px;
+  background: #ffffff;
+  color: #222222;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  z-index: 100;
+  line-height: 1;
+  transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  user-select: none;
+}
+
+.lightbox-close:hover {
+  transform: scale(1.15);
+  background: #ff4757;
+  color: #ffffff;
 }
 
 /* Simple fade-in */
@@ -1154,15 +1205,26 @@ audio {
 	height: 183px;
 	background-repeat: no-repeat no-repeat;
 	background-size: 100px 183px;
+	display: flex !important;
+	flex-direction: column !important;
+	align-items: center !important;
+	justify-content: flex-start !important;
+	text-align: center !important;
 }
 .balloons h2 {
 	text-transform: uppercase;
-	font-family: 'Happy', 'Signika', cursive, sans-serif !important;
+	font-family: 'Happy', 'Sweet-Toffee', 'Happy-Alt', cursive, sans-serif !important;
 	font-weight: bold;
 	font-size: 52px;
 	color: #BF4136;
 	text-shadow: 2px 2px 4px rgba(255,255,255,0.95), 0 0 10px rgba(255,255,255,0.85);
 	display: none;
+	margin: 0 !important;
+	padding: 0 !important;
+	padding-top: 14% !important;
+	line-height: 1 !important;
+	width: 100% !important;
+	text-align: center !important;
 }
 #b1,#b11 {
 	background-image: url('../assets/images/balloons/b1.png');
@@ -1355,7 +1417,7 @@ audio {
 }
 
 .message p {
-  font-family: 'Happy', 'Signika', cursive, sans-serif !important;
+  font-family: 'Happy', 'Sweet-Toffee', 'Happy-Alt', cursive, sans-serif !important;
   font-size: clamp(20px, 5.5vw, 52px);
   text-transform: uppercase;
   color: #C4515C;

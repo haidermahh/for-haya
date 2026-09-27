@@ -24,13 +24,14 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/fonts.css">
 	<link rel="stylesheet" type="text/css" href="css/stylesheet.css">
 	<link rel="stylesheet" type="text/css" href="css/loading.css">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet/less" href="cake.less"> 
-	<style type="text/css" id="less:birthday-cake">
+	<style type="text/css">
 @font-face {
   font-family: 'Happy';
   src: url('assets/fonts/Sweet-Toffee.ttf') format('truetype'),
@@ -40,22 +41,34 @@
   font-display: swap;
 }
 @font-face {
-  font-family: 'Signika';
-  src: url('assets/fonts/Happy.ttf') format('truetype'),
-       url('assets/fonts/Sweet-Toffee.ttf') format('truetype');
+  font-family: 'Sweet-Toffee';
+  src: url('assets/fonts/Sweet-Toffee.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
+.balloons {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: center !important;
+}
 .balloons h2 {
-  font-family: 'Happy', 'Signika', 'Signika Negative', cursive, sans-serif !important;
+  font-family: 'Happy', 'Sweet-Toffee', 'Signika', cursive, sans-serif !important;
   font-weight: bold !important;
   font-size: 52px !important;
   color: #BF4136;
   text-shadow: 2px 2px 4px rgba(255,255,255,0.95), 0 0 10px rgba(255,255,255,0.85);
+  margin: 0 !important;
+  padding: 0 !important;
+  padding-top: 14% !important;
+  line-height: 1 !important;
+  width: 100% !important;
+  text-align: center !important;
 }
 .message p {
-  font-family: 'Happy', 'Signika', sans-serif !important;
+  font-family: 'Happy', 'Sweet-Toffee', 'Signika', cursive, sans-serif !important;
 }
     
     /* ============================================== POSITION
@@ -350,9 +363,17 @@ html, body {
     margin: 8px auto 0;
   }
   .cake {
-    top: 335px;
-    transform: scale(0.92);
+    top: min(42vh, 255px) !important;
+    transform: scale(0.82) !important;
     transform-origin: center top;
+  }
+  .message {
+    top: 56% !important;
+    width: 90% !important;
+    max-width: 800px;
+  }
+  .message p {
+    font-size: clamp(28px, 3.5vw, 46px) !important;
   }
   .profile-img {
     display: none !important;
@@ -383,9 +404,17 @@ html, body {
     margin: 6px auto 0;
   }
   .cake {
-    top: 310px;
-    transform: scale(0.82);
+    top: min(42vh, 245px) !important;
+    transform: scale(0.75) !important;
     transform-origin: center top;
+  }
+  .message {
+    top: 58% !important;
+    width: 90% !important;
+    max-width: 650px;
+  }
+  .message p {
+    font-size: clamp(24px, 3.8vw, 36px) !important;
   }
   .profile-img {
     display: none !important;
@@ -419,8 +448,8 @@ html, body {
     margin: 4px auto 0 !important;
   }
   .cake {
-    top: 290px;
-    transform: scale(0.68);
+    top: min(39vh, 235px) !important;
+    transform: scale(0.65) !important;
     transform-origin: center top;
     z-index: 10;
   }
@@ -438,13 +467,13 @@ html, body {
     padding-right: 2px;
   }
   .message {
-    top: 48% !important;
+    top: 64% !important;
     width: 95% !important;
     max-width: 420px;
     padding: 0 10px;
   }
   .message p {
-    font-size: clamp(20px, 5.5vw, 34px) !important;
+    font-size: clamp(20px, 5.2vw, 32px) !important;
     line-height: 1.35 !important;
     margin: 8px 0 !important;
     text-shadow: 2px 2px 3px #FFF, 0 0 8px #FFF !important;
@@ -473,9 +502,15 @@ html, body {
   .album-right-2 { top: 285px; right: 4px; }
   .can-zoom { width: 72px; top: 350px; right: 4px; }
   .cake {
-    top: 270px;
-    transform: scale(0.6);
+    top: 220px !important;
+    transform: scale(0.56) !important;
     transform-origin: center top;
+  }
+  .message {
+    top: 64% !important;
+  }
+  .message p {
+    font-size: 18px !important;
   }
 }
 
@@ -513,8 +548,8 @@ p {
 	<div class="loading"></div>
   <img src="assets/images/photo1.jpg" class="album-photo album-left-1" alt="Photo 1">
   <img src="assets/images/photo2.jpg" class="album-photo album-left-2" alt="Photo 2">
-  <img src="assets/images/photo3.png" class="album-photo album-right-1" alt="Photo 3" onerror="this.onerror=null;this.src='assets/images/photo3.jpg';">
-  <img src="assets/images/photo4.png" class="album-photo album-right-2" alt="Photo 4" onerror="this.onerror=null;this.src='assets/images/photo4.jpg';">
+  <img src="assets/images/photo3.jpg" class="album-photo album-right-1" alt="Photo 3" onerror="this.onerror=null;this.src='assets/images/photo3.png';">
+  <img src="assets/images/photo4.jpg" class="album-photo album-right-2" alt="Photo 4" onerror="this.onerror=null;this.src='assets/images/photo4.png';">
 
   <!-- Hint image -->
   <img src="assets/images/can-zoom.png" class="can-zoom">
@@ -533,16 +568,16 @@ p {
     	<h2 style="color:#D14D39;">D</h2>
     </div>
 	<div class="balloons text-center" id="b4">
-    	<h2 style="color:#8FAD00;">B</h2>
+    	<h2 style="color:#8FAD00;">H</h2>
     </div>
 	<div class="balloons text-center" id="b5">
     	<h2 style="color:#8377E4;">A</h2>
     </div>
     <div class="balloons text-center" id="b6">
-    	<h2 style="color:#99C96A;">B</h2>
+    	<h2 style="color:#99C96A;">Y</h2>
     </div>
     <div class="balloons text-center" id="b7">
-    	<h2 style="color:#20CFB4;">Y</h2>
+    	<h2 style="color:#20CFB4;">A</h2>
     </div>
 
     <img src="assets/images/Balloon-Border.png" width="100%" class="balloon-border">
@@ -673,7 +708,10 @@ p {
 
 	</div>
   <div class="lightbox" id="lightbox">
-    <img src="" alt="zoomed photo">
+    <div class="lightbox-content">
+      <span class="lightbox-close" title="Close">&times;</span>
+      <img id="lightbox-img" src="" alt="Zoomed Photo">
+    </div>
   </div>
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
